@@ -14,13 +14,13 @@ const next = require('next')
 const socketServer = require('socket.io')
 
 //modul mongodb utk koneksi mongo db database
-const url = 'mongodb://127.0.0.1:27017/sp2020';
+const url = 'mongodb://127.0.0.1:27017/bps';
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
 let runServer = () => {
-  const port = 82
+  const port = 83
   const dev = process.env.NODE_ENV !== 'production'
   const app = next({ dev })
   const handle = app.getRequestHandler()
@@ -65,7 +65,7 @@ let runServer = () => {
       io.use(sharedsession(sessionWithMongo, cookieParser("ID==&&%^&A&SHBJSAsjhbJGhUGkbKiUvii^%^#$%^&98G8UIugg==")));
       io.on('connection', function (client) {
         console.log("Hey, someone connected");
-        // require('./api/socket/penilaian.api.socket')(client, all_connected_clients)
+        require('./api/master_suratkeluar.api')(client)
         client.on('disconnect', () => {
           console.log("Hey, someone disconnected");
         })

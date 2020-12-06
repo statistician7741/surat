@@ -5,11 +5,11 @@ export default class extends React.Component {
   static async getInitialProps({ req, res }) {
     if (res) {
       res.writeHead(302, {
-        Location: `http://${req.hostname}:83/suratkeluar`
+        Location: `http://${req.hostname}:83/suratkeluar/baru`
       })
       res.end()
     } else {
-      Router.push("/suratkeluar")
+      Router.push("/")
     }
     return {}
   }
