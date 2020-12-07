@@ -3,11 +3,26 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var SuratKeluarSchema = new Schema({
-    "nomor": Number,
-    "tgl_spd": Date,
-    "perihal": String,
-    "tujuan": String,
-    "seksi": String,
+    "nomor": {
+        type: Number,
+        required: true
+    },
+    "tgl_spd": {
+        type: Date,
+        required: true
+    },
+    "perihal": {
+        type: Number,
+        required: true
+    },
+    "tujuan": {
+        type: Number,
+        required: true
+    },
+    "seksi": {
+        type: Number,
+        required: true
+    },
     "pemohon": {
         'nama': String,
         'nip': String

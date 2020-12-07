@@ -30,7 +30,7 @@ export default class Index extends React.Component {
                 ghost={false}
             >
                 {activePage === 'ambil-nomor-baru' ?
-                    <Editor onSwitchPage={this.onSwitchPage} setData={this.setData} data={data} /> :
+                    <Editor onSwitchPage={this.onSwitchPage} setData={this.setData} data={data} {...this.props} /> :
                     <Summary  setData={this.setData} data={data} {...this.props} />}
             </PageHeader>
         )

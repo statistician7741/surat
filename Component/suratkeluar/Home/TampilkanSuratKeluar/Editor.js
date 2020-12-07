@@ -23,12 +23,23 @@ export default class Editor extends React.Component {
         this.props.setData(changedValues)
     }
 
+    onClickAmbilNomor = (data)=>{
+        this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', data, (response) => {
+            if (response.type === 'ok') {
+              console.log(response);
+            } else {
+              this.props.showErrorMessage(response.data)
+            }
+          })
+    }
+
     componentDidMount = () => {
         this.formRef.current && this.formRef.current.setFieldsValue(this.props.data)
     }
     formRef = React.createRef();
     render() {
-        const { onSwitchPage } = this.props;
+        const { onSwitchPage, data } = this.props;
+        console.log(this.props);
         return (
             <Row gutter={[64, 0]}>
                 <Col xs={24} md={24}>
@@ -49,7 +60,8 @@ export default class Editor extends React.Component {
                                     message: 'Mohon pilih tanggal surat',
                                 },
                             ]}
-
+                            hasFeedback
+                            validateStatus={data.tgl_surat?"success":undefined}
                         >
                             <DatePicker format="DD MMMM YYYY" style={{ width: 200 }} />
                         </Form.Item>
@@ -62,6 +74,8 @@ export default class Editor extends React.Component {
                                     message: 'Mohon isi perihal surat Anda.',
                                 },
                             ]}
+                            hasFeedback
+                            validateStatus={data.perihal?"success":undefined}
                         >
                             <TextArea
                                 placeholder="Perihal..."
@@ -77,6 +91,8 @@ export default class Editor extends React.Component {
                                     message: 'Mohon isi tujuan surat Anda.',
                                 },
                             ]}
+                            hasFeedback
+                            validateStatus={data.tujuan?"success":undefined}
                         >
                             <TextArea
                                 placeholder="Tujuan surat..."
@@ -91,6 +107,8 @@ export default class Editor extends React.Component {
                                     required: true
                                 },
                             ]}
+                            hasFeedback
+                            validateStatus={data.seksi?"success":undefined}
 
                         >
                             <Select style={{ width: 200 }}>
@@ -103,7 +121,7 @@ export default class Editor extends React.Component {
                                 sm: { span: 12, offset: 6 },
                             }}
                         >
-                            <Button type="primary" onClick = {()=>onSwitchPage('show-number')}>Ambil Nomor Baru</Button>
+                            <Button type="primary" onClick = {()=>this.onClickAmbilNomor(data)}>Ambil Nomor Baru</Button>
                         </Form.Item>
                     </Form>
                 </Col>

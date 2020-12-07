@@ -71,6 +71,7 @@ export default class Editor extends React.Component {
 
     render() {
         const { uploading, fileList, isEditing } = this.state;
+        const { data } = this.props;
         const props = {
             onRemove: file => {
                 this.setState(state => {
@@ -104,7 +105,7 @@ export default class Editor extends React.Component {
                                 name="nomor_surat"
 
                             >
-                                <span style={{ fontSize: 30 }}>242</span><Text copyable={{ text: "123456", tooltips: ['Copy?', 'Tercopy!'] }}></Text>
+                                <span style={{ fontSize: 30 }}>242/74041/12/2020</span><Text copyable={{ text: "242/74041/12/2020", tooltips: ['Copy?', 'Tercopy!'] }}></Text>
                             </Form.Item>
                             <Form.Item
                                 label="Arsip"
@@ -139,6 +140,8 @@ export default class Editor extends React.Component {
                                         message: 'Mohon pilih tanggal surat',
                                     },
                                 ]}
+                                hasFeedback={isEditing}
+                                validateStatus={data.tgl_surat?"success":undefined}
                             >
                                 <DatePicker format="DD MMMM YYYY" style={{ width: 200 }}  disabled={!isEditing} />
                             </Form.Item>
@@ -151,6 +154,8 @@ export default class Editor extends React.Component {
                                         message: 'Mohon isi perihal surat',
                                     },
                                 ]}
+                                hasFeedback={isEditing}
+                                validateStatus={data.perihal?"success":undefined}
                             >
                                 <TextArea
                                     placeholder="Perihal..."
@@ -167,6 +172,8 @@ export default class Editor extends React.Component {
                                         message: 'Mohon isi tujuan surat',
                                     },
                                 ]}
+                                hasFeedback={isEditing}
+                                validateStatus={data.tujuan?"success":undefined}
                             >
                                 <TextArea
                                     placeholder="Tujuan surat..."
@@ -183,6 +190,8 @@ export default class Editor extends React.Component {
                                         message: 'Mohon pilih seksi',
                                     },
                                 ]}
+                                hasFeedback={isEditing}
+                                validateStatus={data.seksi?"success":undefined}
                             >
                                 <Select style={{ width: 200 }} disabled={!isEditing}>
                                     {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
