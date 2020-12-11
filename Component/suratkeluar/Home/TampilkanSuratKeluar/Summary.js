@@ -1,6 +1,6 @@
-import { Row, Col, Typography, Upload, Button, Form, Input, Select, DatePicker, Space, Popconfirm } from 'antd'
+import { Row, Col, Typography, Upload, Button, Form, Input, Select, DatePicker, Space, Popconfirm, AutoComplete, Divider } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
-import reqwest from 'reqwest';
+import axios from 'axios'
 const { Text } = Typography
 const { TextArea } = Input
 const { Option } = Select
@@ -22,10 +22,14 @@ export default class Editor extends React.Component {
     state = {
         fileList: [],
         uploading: false,
-        isEditing: false
+        isEditing: false,
+        autoCompleteDataSource: [],
+        processing: false,
     }
 
-    toggleEditing = () => this.setState({ isEditing: !this.state.isEditing })
+    toggleEditing = () => {
+        this.setState({ isEditing: !this.state.isEditing }, () => this.input.focus())
+    }
 
     onChangeInput = (changedValues) => {
         this.props.setData(changedValues)
@@ -37,55 +41,87 @@ export default class Editor extends React.Component {
         fileList.forEach(file => {
             formData.append('files[]', file);
         });
-
+        formData.append('_id', this.props.data._id);
         this.setState({
             uploading: true,
-        });
-
-        // You can use any AJAX library you like
-        reqwest({
-            url: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-            method: 'post',
-            processData: false,
-            data: formData,
-            success: () => {
-                this.setState({
-                    fileList: [],
-                    uploading: false,
+        }, () => {
+            axios.post('/suratkeluar/arsip/upload', formData)
+                .then((response) => {
+                    console.log(response);
+                    if (response.data === 'OK') {
+                        this.setState({ uploading: false }, () => {
+                            this.props.showSuccessMessage('Berhasil diupload.')
+                        })
+                    } else {
+                        this.props.showErrorMessage('Gagal mengupload file. Harap hubungi Administrasi.')
+                        this.setState({ uploading: false })
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
                 });
-                this.props.showSuccessMessage('upload successfully.');
-            },
-            error: () => {
-                this.setState({
-                    uploading: false,
-                });
-                this.props.showErrorMessage('upload failed.');
-            },
         });
     };
+    safeQuery = (q) => {
+        if (typeof q === 'string') return q.replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, "\\$&")
+        else return q
+    }
+    handleAutoCSearch = (query, field) => {
+        const { socket } = this.props;
+        let q = { query: this.safeQuery(query), field }
+        socket.emit('api.general.autocomplete/getSuggestion', q, ({ data }) => {
+            this.setState({ autoCompleteDataSource: query ? data : [] });
+        })
+    }
+
+    simpan = (data) => {
+        this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', data, (response) => {
+            if (response.type === 'OK') {
+                this.setState({ processing: false, isEditing: false }, () => this.props.showSuccessMessage("Berhasil diupdate"))
+            } else {
+                this.props.showErrorMessage(response.message)
+            }
+        })
+    }
+
+    onRemoveFileUploaded = (filename, cb) => {
+        this.props.socket.emit('api.master_suratkeluar.editor/removeFileUploaded', filename, (response) => {
+            if (response.type === 'OK') {
+                this.props.showSuccessMessage("Arsip berhasil dihapus di server")
+            }
+            cb()
+        })
+    }
+
+    onClickSimpan = () => {
+        this.setState({ processing: true }, () => this.simpan(this.props.data))
+    }
 
     componentDidMount = () => {
         this.formRef.current && this.formRef.current.setFieldsValue(this.props.data)
     }
     formRef = React.createRef();
-
+    saveInputRef = input => this.input = input
     render() {
-        const { uploading, fileList, isEditing } = this.state;
-        const { data } = this.props;
+        const { uploading, fileList, isEditing, processing } = this.state;
+        const { _id, nomor, perihal, tujuan, seksi } = this.props.data;
+        const { autoCompleteDataSource } = this.state;
         const props = {
             onRemove: file => {
-                this.setState(state => {
-                    const index = state.fileList.indexOf(file);
-                    const newFileList = state.fileList.slice();
-                    newFileList.splice(index, 1);
-                    return {
-                        fileList: newFileList,
-                    };
-                });
+                this.onRemoveFileUploaded({_id, filename: file.name}, ()=>{
+                    this.setState(state => {
+                        const index = state.fileList.indexOf(file);
+                        const newFileList = state.fileList.slice();
+                        newFileList.splice(index, 1);
+                        return {
+                            fileList: newFileList,
+                        };
+                    });
+                })
             },
             beforeUpload: file => {
                 this.setState(state => ({
-                    fileList: [...state.fileList, file],
+                    fileList: [file],
                 }));
                 return false;
             },
@@ -102,14 +138,12 @@ export default class Editor extends React.Component {
                         >
                             <Form.Item
                                 label="Nomor Surat"
-                                name="nomor_surat"
 
                             >
-                                <span style={{ fontSize: 30 }}>242/74041/12/2020</span><Text copyable={{ text: "242/74041/12/2020", tooltips: ['Copy?', 'Tercopy!'] }}></Text>
+                                <span style={{ fontSize: 40 }}>{nomor}</span><Text copyable={{ text: nomor, tooltips: ['Copy?', 'Tercopy!'] }}></Text>
                             </Form.Item>
                             <Form.Item
                                 label="Arsip"
-                                name="arsip"
                                 extra="mohon upload arsip surat"
                             >
                                 <Upload {...props}>
@@ -131,19 +165,12 @@ export default class Editor extends React.Component {
                                     {uploading ? 'Uploading...' : 'Upload arsip'}
                                 </Button>
                             </Form.Item>
+                            <Divider plain>Detail Surat Keluar</Divider>
                             <Form.Item
                                 label="Tanggal Surat"
                                 name="tgl_surat"
-                                rules={[
-                                    {
-                                        required: isEditing,
-                                        message: 'Mohon pilih tanggal surat',
-                                    },
-                                ]}
-                                hasFeedback={isEditing}
-                                validateStatus={data.tgl_surat?"success":undefined}
                             >
-                                <DatePicker format="DD MMMM YYYY" style={{ width: 200 }}  disabled={!isEditing} />
+                                <DatePicker format="DD MMMM YYYY" style={{ width: 200 }} disabled />
                             </Form.Item>
                             <Form.Item
                                 label="Perihal"
@@ -155,13 +182,21 @@ export default class Editor extends React.Component {
                                     },
                                 ]}
                                 hasFeedback={isEditing}
-                                validateStatus={data.perihal?"success":undefined}
+                                validateStatus={perihal ? "success" : undefined}
                             >
-                                <TextArea
-                                    placeholder="Perihal..."
-                                    style={{ height: 50 }}
+                                <AutoComplete
+                                    allowClear
+                                    options={autoCompleteDataSource}
+                                    onSearch={q => this.handleAutoCSearch(q, 'perihal')}
+                                    style={{ width: "100%" }}
                                     disabled={!isEditing}
-                                />
+                                >
+                                    <TextArea
+                                        ref={this.saveInputRef}
+                                        placeholder="Perihal..."
+                                        style={{ height: 50 }}
+                                    />
+                                </AutoComplete>
                             </Form.Item>
                             <Form.Item
                                 label="Tujuan"
@@ -173,13 +208,20 @@ export default class Editor extends React.Component {
                                     },
                                 ]}
                                 hasFeedback={isEditing}
-                                validateStatus={data.tujuan?"success":undefined}
+                                validateStatus={tujuan ? "success" : undefined}
                             >
-                                <TextArea
-                                    placeholder="Tujuan surat..."
-                                    style={{ height: 50 }}
+                                <AutoComplete
+                                    allowClear
+                                    options={autoCompleteDataSource}
+                                    onSearch={q => this.handleAutoCSearch(q, 'tujuan')}
+                                    style={{ width: "100%" }}
                                     disabled={!isEditing}
-                                />
+                                >
+                                    <TextArea
+                                        placeholder="Tujuan surat..."
+                                        style={{ height: 50 }}
+                                    />
+                                </AutoComplete>
                             </Form.Item>
                             <Form.Item
                                 label="Seksi"
@@ -191,7 +233,7 @@ export default class Editor extends React.Component {
                                     },
                                 ]}
                                 hasFeedback={isEditing}
-                                validateStatus={data.seksi?"success":undefined}
+                                validateStatus={seksi ? "success" : undefined}
                             >
                                 <Select style={{ width: 200 }} disabled={!isEditing}>
                                     {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
@@ -204,7 +246,7 @@ export default class Editor extends React.Component {
                                 }}
                             >
                                 <Space>
-                                    <Button type="primary" onClick={this.toggleEditing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
+                                    <Button type="primary" onClick={isEditing ? this.onClickSimpan : this.toggleEditing} disabled={!perihal || !tujuan || !seksi} loading={processing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
                                     <Popconfirm placement="topRight" title={`Hapus nomor surat ini?`} okText="Ya" cancelText="Tidak">
                                         <Button type="danger">Hapus</Button>
                                     </Popconfirm>

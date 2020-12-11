@@ -47,6 +47,7 @@ let runServer = () => {
       const serve = http.createServer(server);
 
       // server.use('/api/login', require("./api/login.api"));
+      server.use('/suratkeluar/arsip', require("./api/arsip.api"));
 
       //Kompresi gzip
       const compression = require('compression');
@@ -66,6 +67,7 @@ let runServer = () => {
       io.on('connection', function (client) {
         console.log("Hey, someone connected");
         require('./api/master_suratkeluar.api')(client)
+        require('./api/general.api')(client)
         client.on('disconnect', () => {
           console.log("Hey, someone disconnected");
         })
@@ -85,6 +87,7 @@ let start = () => {
       })
     } else {
       runServer();
+      require('./cron/nomor_kosong_mingguan')
     }
   });
 }

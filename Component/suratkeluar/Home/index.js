@@ -14,28 +14,36 @@ const tabs = [{
 
 export default class HomeIndex extends React.Component {
     state = {
-
+        activeKey: undefined,
+        dataTemp: undefined
     }
 
-    onChangeTab = (key) => {
-        this.setState({ activeKey: key }, () => {
+    setTab = (key, record, cb)=>this.setState({ activeKey: key, dataTemp: record }, ()=>cb())
+
+    onChangeTab = (key, record) => {
+        this.setTab(key, record, () => {
             Router.push({
                 pathname: '/suratkeluar/baru',
-                query: { tab: key },
+                query: key==='Nomor'?{ tab: key, _id: record?record._id:'' }:{ tab: key }
             })
         })
+        // Router.push({
+        //     pathname: '/suratkeluar/baru',
+        //     query: key==='Nomor'?{ tab: key, _id }:{ tab: key }
+        // })
     }
 
     render() {
+        const { activeKey, dataTemp } = this.state;
         const { router } = this.props;
         return (
             <PageHeader
                 className="site-page-header"
                 title="Surat Keluar"
             >
-                <Tabs defaultActiveKey={router.query.tab} onChange={this.onChangeTab} animated={false}>
+                <Tabs defaultActiveKey={router.query.tab} activeKey={activeKey} onChange={this.onChangeTab} animated={false}>
                     {tabs.map(t => <TabPane tab={`${t.name}`} key={`${t.name}`}>
-                        {<t.Component {...this.props} />}
+                        {<t.Component {...this.props} onChangeTab={this.onChangeTab} tab={router.query.tab} _id={router.query._id} dataTemp={dataTemp} />}
                     </TabPane>)}
                 </Tabs>
             </PageHeader>

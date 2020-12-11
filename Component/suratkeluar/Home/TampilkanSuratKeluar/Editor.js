@@ -1,4 +1,5 @@
-import { Row, Col, Button, Form, Input, Select, DatePicker } from 'antd'
+import { Row, Col, Button, Form, Input, Select, DatePicker, AutoComplete } from 'antd'
+import moment from 'moment'
 const { TextArea } = Input
 const { Option } = Select
 
@@ -17,28 +18,51 @@ const all_seksi = ['Tata Usaha', 'Sosial', 'Produksi', 'Distribusi', 'Nerwilis',
 
 export default class Editor extends React.Component {
     state = {
-
+        processing: false,
+        autoCompleteDataSource: []
     }
     onChangeInput = (changedValues) => {
         this.props.setData(changedValues)
     }
 
-    onClickAmbilNomor = (data)=>{
+    ambilNomor = (data) => {
         this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', data, (response) => {
-            if (response.type === 'ok') {
-              console.log(response);
+            if (response.type === 'OK') {
+                this.props.setData({ nomor: response.data.nomor, _id: response.data._id }, () => {
+                    this.setState({ processing: false }, () => {
+                        this.props.onSwitchPage('summary');
+                    })
+                })
             } else {
-              this.props.showErrorMessage(response.data)
+                this.props.showErrorMessage(response.message)
             }
-          })
+        })
+    }
+
+    onClickAmbilNomor = () => {
+        this.setState({ processing: true }, () => this.ambilNomor(this.props.data))
+    }
+    safeQuery = (q) => {
+        if (typeof q === 'string') return q.replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, "\\$&")
+        else return q
+    }
+    handleAutoCSearch = (query, field) => {
+        const { socket } = this.props;
+        let q = { query: this.safeQuery(query), field }
+        socket.emit('api.general.autocomplete/getSuggestion', q, ({ data }) => {
+            this.setState({ autoCompleteDataSource: query ? data : [] });
+        })
     }
 
     componentDidMount = () => {
+        this.input && this.input.focus()
         this.formRef.current && this.formRef.current.setFieldsValue(this.props.data)
     }
     formRef = React.createRef();
+    saveInputRef = input => this.input = input
     render() {
-        const { onSwitchPage, data } = this.props;
+        const { tgl_surat, perihal, tujuan, seksi } = this.props.data;
+        const { autoCompleteDataSource, processing } = this.state;
         console.log(this.props);
         return (
             <Row gutter={[64, 0]}>
@@ -61,9 +85,16 @@ export default class Editor extends React.Component {
                                 },
                             ]}
                             hasFeedback
-                            validateStatus={data.tgl_surat?"success":undefined}
+                            validateStatus={tgl_surat ? "success" : undefined}
                         >
-                            <DatePicker format="DD MMMM YYYY" style={{ width: 200 }} />
+                            <DatePicker
+                                disabledDate={(current) => {
+                                    return (current.day() === 0 || current.day() === 6 || current.isAfter(moment()))
+                                }}
+                                format="DD MMMM YYYY"
+                                style={{ width: 200 }}
+                                disabled={processing}
+                            />
                         </Form.Item>
                         <Form.Item
                             label="Perihal"
@@ -71,16 +102,25 @@ export default class Editor extends React.Component {
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Mohon isi perihal surat Anda.',
+                                    message: 'Mohon isi perihal surat Anda',
                                 },
                             ]}
                             hasFeedback
-                            validateStatus={data.perihal?"success":undefined}
+                            validateStatus={perihal ? "success" : undefined}
                         >
-                            <TextArea
-                                placeholder="Perihal..."
-                                style={{ height: 50 }}
-                            />
+                            <AutoComplete
+                                allowClear
+                                options={autoCompleteDataSource}
+                                onSearch={q => this.handleAutoCSearch(q, 'perihal')}
+                                style={{ width: "100%" }}
+                                disabled={processing}
+                            >
+                                <TextArea
+                                    ref={this.saveInputRef}
+                                    placeholder="Perihal surat"
+                                    style={{ height: 50 }}
+                                />
+                            </AutoComplete>
                         </Form.Item>
                         <Form.Item
                             label="Tujuan"
@@ -88,16 +128,24 @@ export default class Editor extends React.Component {
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Mohon isi tujuan surat Anda.',
+                                    message: 'Mohon isi tujuan surat Anda',
                                 },
                             ]}
                             hasFeedback
-                            validateStatus={data.tujuan?"success":undefined}
+                            validateStatus={tujuan ? "success" : undefined}
                         >
-                            <TextArea
-                                placeholder="Tujuan surat..."
-                                style={{ height: 50 }}
-                            />
+                            <AutoComplete
+                                allowClear
+                                options={autoCompleteDataSource}
+                                onSearch={q => this.handleAutoCSearch(q, 'tujuan')}
+                                style={{ width: "100%" }}
+                                disabled={processing}
+                            >
+                                <TextArea
+                                    placeholder="Tujuan surat"
+                                    style={{ height: 50 }}
+                                />
+                            </AutoComplete>
                         </Form.Item>
                         <Form.Item
                             label="Seksi"
@@ -108,10 +156,10 @@ export default class Editor extends React.Component {
                                 },
                             ]}
                             hasFeedback
-                            validateStatus={data.seksi?"success":undefined}
+                            validateStatus={seksi ? "success" : undefined}
 
                         >
-                            <Select style={{ width: 200 }}>
+                            <Select style={{ width: 200 }} placeholder="Pilih seksi" disabled={processing}>
                                 {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
                             </Select>
                         </Form.Item>
@@ -121,7 +169,7 @@ export default class Editor extends React.Component {
                                 sm: { span: 12, offset: 6 },
                             }}
                         >
-                            <Button type="primary" onClick = {()=>this.onClickAmbilNomor(data)}>Ambil Nomor Baru</Button>
+                            <Button type="primary" onClick={this.onClickAmbilNomor} disabled={!tgl_surat || !perihal || !tujuan || !seksi} loading={processing}>Ambil Nomor Baru</Button>
                         </Form.Item>
                     </Form>
                 </Col>

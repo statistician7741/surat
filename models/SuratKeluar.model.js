@@ -3,33 +3,43 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var SuratKeluarSchema = new Schema({
-    "nomor": {
+    "_id": { //tahun+nomor
+        type: String,
+        required: true
+    },
+    "nomor": { //nomor
         type: Number,
         required: true
     },
-    "tgl_spd": {
+    "tgl_surat": {
         type: Date,
-        required: true
     },
     "perihal": {
-        type: Number,
-        required: true
+        type: String,
     },
     "tujuan": {
-        type: Number,
-        required: true
+        type: String,
     },
     "seksi": {
-        type: Number,
-        required: true
+        type: String,
     },
     "pemohon": {
         'nama': String,
         'nip': String
     },
+    "arsip": {
+        type: String,
+    },
+    "arsip_filename": {
+        type: String,
+    },
     "timestamp": {
         'type': Date,
         'default': Date.now
+    },
+    "nomor_kosong": {
+        'type': Boolean,
+        'default': false
     }
 }, { collection: 'suratkeluar' });
 
