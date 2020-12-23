@@ -15,7 +15,7 @@ module.exports = (input, cb, client) => {
                 fs.unlinkSync(`${file_path}${_id}_${filename}`);
                 r_cb(null, 'deleted')
             }
-            else r_cb('none to delete', null)
+            else r_cb(null, 'none to delete')
         },
         updateNomor: ['removeOldFile', (prevR, u_cb) => {
             SuratKeluar.updateOne({

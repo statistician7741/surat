@@ -22,9 +22,6 @@ function upload(req, res) {
         }
         //1. simpan arsip ke disk
         const { _id } = fields
-        const new_name = `${form.uploadDir}${_id}_${files['files[]'].name}`
-        fs.rename(files['files[]'].path, new_name, () => { });
-        //2. rename 
         //3. update db
         async.auto({
             removeOldFile: (r_cb) => {
@@ -40,6 +37,9 @@ function upload(req, res) {
                 })
             },
             updateNomor: ['removeOldFile', (prevR, u_cb) => {
+                const new_name = `${form.uploadDir}${_id}_${files['files[]'].name}`
+                fs.rename(files['files[]'].path, new_name, () => { });
+                //2. rename 
                 SuratKeluar.updateOne({
                     _id
                 }, {

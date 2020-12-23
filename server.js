@@ -49,6 +49,9 @@ let runServer = () => {
       // server.use('/api/login', require("./api/login.api"));
       server.use('/suratkeluar/arsip', require("./api/arsip.api"));
 
+      //download path
+      server.use('/arsip/download', express.static(`${__dirname}/arsip`))
+
       //Kompresi gzip
       const compression = require('compression');
       server.use(compression());

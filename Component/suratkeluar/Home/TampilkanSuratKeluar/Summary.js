@@ -16,7 +16,7 @@ const formItemLayout = {
     },
 };
 
-const all_seksi = ['Tata Usaha', 'Sosial', 'Produksi', 'Distribusi', 'Nerwilis', 'IPDS', 'Tidak ada']
+const all_seksi = ['Subbagian Umum', 'Sosial', 'Produksi', 'Distribusi', 'Nerwilis', 'IPDS', 'Tidak ada']
 
 export default class Editor extends React.Component {
     state = {
@@ -25,6 +25,7 @@ export default class Editor extends React.Component {
         isEditing: false,
         autoCompleteDataSource: [],
         processing: false,
+        arsipUploaded: false
     }
 
     toggleEditing = () => {
@@ -36,8 +37,16 @@ export default class Editor extends React.Component {
     }
 
     handleUpload = () => {
-        const { fileList } = this.state;
+        const { fileList, arsipUploaded } = this.state;
+        if (fileList.length === 0) {
+            this.props.showErrorMessage('Mohon pilih file terlebih dahulu')
+            return
+        } else if (arsipUploaded) {
+            this.props.showErrorMessage('Arsip sudah terupload sebelumnya')
+            return
+        }
         const formData = new FormData();
+        const name = fileList[0].name;
         fileList.forEach(file => {
             formData.append('files[]', file);
         });
@@ -47,10 +56,16 @@ export default class Editor extends React.Component {
         }, () => {
             axios.post('/suratkeluar/arsip/upload', formData)
                 .then((response) => {
-                    console.log(response);
                     if (response.data === 'OK') {
-                        this.setState({ uploading: false }, () => {
-                            this.props.showSuccessMessage('Berhasil diupload.')
+                        this.setState({
+                            uploading: false, arsipUploaded: true, fileList: [{
+                                uid: 1,
+                                name,
+                                status: 'done',
+                                url: `/arsip/download/${this.props.data._id}_${name}`
+                            }]
+                        }, () => {
+                            this.props.showSuccessMessage('Berhasil diupload')
                         })
                     } else {
                         this.props.showErrorMessage('Gagal mengupload file. Harap hubungi Administrasi.')
@@ -74,10 +89,15 @@ export default class Editor extends React.Component {
         })
     }
 
+    resetSearchResult = () => this.setState({ autoCompleteDataSource: [] })
+
     simpan = (data) => {
         this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', data, (response) => {
             if (response.type === 'OK') {
-                this.setState({ processing: false, isEditing: false }, () => this.props.showSuccessMessage("Berhasil diupdate"))
+                this.setState({ processing: false, isEditing: false }, () => {
+                    this.props.showSuccessMessage("Berhasil diupdate")
+                    this.props.getListSuratKeluar()
+                })
             } else {
                 this.props.showErrorMessage(response.message)
             }
@@ -87,7 +107,7 @@ export default class Editor extends React.Component {
     onRemoveFileUploaded = (filename, cb) => {
         this.props.socket.emit('api.master_suratkeluar.editor/removeFileUploaded', filename, (response) => {
             if (response.type === 'OK') {
-                this.props.showSuccessMessage("Arsip berhasil dihapus di server")
+                this.props.showSuccessMessage("Arsip berhasil dihapus")
             }
             cb()
         })
@@ -97,9 +117,39 @@ export default class Editor extends React.Component {
         this.setState({ processing: true }, () => this.simpan(this.props.data))
     }
 
-    componentDidMount = () => {
-        this.formRef.current && this.formRef.current.setFieldsValue(this.props.data)
+    getData = (propsData) => ({
+        nomor: propsData.nomor,
+        tgl_surat: propsData.tgl_surat,
+        perihal: propsData.perihal,
+        tujuan: propsData.tujuan,
+        seksi: propsData.seksi
+    })
+
+    setArsip = () => {
+        if (!this.props.data.arsip) {
+            const fileList = this.props.data.arsip_filename ? [{
+                uid: 1,
+                name: this.props.data.arsip_filename,
+                status: 'done',
+                url: `/arsip/download/${this.props.data.arsip_filename}`
+            }] : []
+            this.setState({ fileList })
+        }
     }
+
+    componentDidMount = () => {
+        this.setArsip();
+        this.formRef.current && this.formRef.current.setFieldsValue(this.getData(this.props.data))
+        this.props.getListSuratKeluar();
+    }
+
+    componentDidUpdate = (prevProps) => {
+        if (prevProps.data !== this.props.data) {
+            this.setArsip();
+            this.formRef.current && this.formRef.current.setFieldsValue(this.getData(this.props.data))
+        }
+    }
+
     formRef = React.createRef();
     saveInputRef = input => this.input = input
     render() {
@@ -108,13 +158,14 @@ export default class Editor extends React.Component {
         const { autoCompleteDataSource } = this.state;
         const props = {
             onRemove: file => {
-                this.onRemoveFileUploaded({_id, filename: file.name}, ()=>{
+                this.onRemoveFileUploaded({ _id, filename: file.name }, () => {
                     this.setState(state => {
                         const index = state.fileList.indexOf(file);
                         const newFileList = state.fileList.slice();
                         newFileList.splice(index, 1);
                         return {
                             fileList: newFileList,
+                            arsipUploaded: false
                         };
                     });
                 })
@@ -122,6 +173,7 @@ export default class Editor extends React.Component {
             beforeUpload: file => {
                 this.setState(state => ({
                     fileList: [file],
+                    arsipUploaded: false
                 }));
                 return false;
             },
@@ -144,7 +196,7 @@ export default class Editor extends React.Component {
                             </Form.Item>
                             <Form.Item
                                 label="Arsip"
-                                extra="mohon upload arsip surat"
+                                name="arsip"
                             >
                                 <Upload {...props}>
                                     <Button icon={<UploadOutlined />}>Pilih file</Button>
@@ -159,7 +211,7 @@ export default class Editor extends React.Component {
                                 <Button
                                     type="primary"
                                     onClick={this.handleUpload}
-                                    disabled={fileList.length === 0}
+                                    // disabled={fileList.length === 0}
                                     loading={uploading}
                                 >
                                     {uploading ? 'Uploading...' : 'Upload arsip'}
@@ -190,10 +242,11 @@ export default class Editor extends React.Component {
                                     onSearch={q => this.handleAutoCSearch(q, 'perihal')}
                                     style={{ width: "100%" }}
                                     disabled={!isEditing}
+                                    onSelect={this.resetSearchResult}
                                 >
                                     <TextArea
                                         ref={this.saveInputRef}
-                                        placeholder="Perihal..."
+                                        placeholder="Perihal surat"
                                         style={{ height: 50 }}
                                     />
                                 </AutoComplete>
@@ -216,9 +269,10 @@ export default class Editor extends React.Component {
                                     onSearch={q => this.handleAutoCSearch(q, 'tujuan')}
                                     style={{ width: "100%" }}
                                     disabled={!isEditing}
+                                    onSelect={this.resetSearchResult}
                                 >
                                     <TextArea
-                                        placeholder="Tujuan surat..."
+                                        placeholder="Tujuan surat"
                                         style={{ height: 50 }}
                                     />
                                 </AutoComplete>
@@ -235,7 +289,7 @@ export default class Editor extends React.Component {
                                 hasFeedback={isEditing}
                                 validateStatus={seksi ? "success" : undefined}
                             >
-                                <Select style={{ width: 200 }} disabled={!isEditing}>
+                                <Select placeholder="Pilih seksi" style={{ width: 200 }} disabled={!isEditing}>
                                     {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
                                 </Select>
                             </Form.Item>
@@ -246,8 +300,8 @@ export default class Editor extends React.Component {
                                 }}
                             >
                                 <Space>
-                                    <Button type="primary" onClick={isEditing ? this.onClickSimpan : this.toggleEditing} disabled={!perihal || !tujuan || !seksi} loading={processing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
-                                    <Popconfirm placement="topRight" title={`Hapus nomor surat ini?`} okText="Ya" cancelText="Tidak">
+                                    <Button type="primary" onClick={isEditing ? this.onClickSimpan : this.toggleEditing} disabled={isEditing && (!perihal || !tujuan || !seksi)} loading={processing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
+                                    <Popconfirm placement="topRight" title={`Hapus nomor surat ini?`} okText="Ya" cancelText="Tidak" onConfirm={() => this.props.deleteSuratKeluar(_id, this.props.resetAmbilNomorBaru)}>
                                         <Button type="danger">Hapus</Button>
                                     </Popconfirm>
                                 </Space>

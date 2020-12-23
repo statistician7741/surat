@@ -1,40 +1,119 @@
 import dynamic from 'next/dynamic';
-import { Tabs, PageHeader } from 'antd';
+import { Tabs, PageHeader, Spin } from 'antd';
 import Router from 'next/router'
+import moment from 'moment'
 
 const { TabPane } = Tabs;
 
-const tabs = [{
-    name: 'Nomor',
-    Component: dynamic(() => import("./TampilkanSuratKeluar"))
-}, {
-    name: 'Daftar',
-    Component: dynamic(() => import("./Daftar"))
-}]
+const NomorComp = dynamic(() => import("./TampilkanSuratKeluar"))
+const DaftarComp = dynamic(() => import("./Daftar"))
+
+const tabs = ['nomor', 'daftar']
 
 export default class HomeIndex extends React.Component {
     state = {
         activeKey: undefined,
-        dataTemp: undefined
+        loadingRecord: true,
+        data: {
+            nomor: undefined,
+            tgl_surat: moment(),
+            perihal: undefined,
+            tujuan: undefined,
+            seksi: undefined
+        },
+        all_suratkeluar: [],
+        loadingDaftar: false
     }
 
-    setTab = (key, record, cb)=>this.setState({ activeKey: key, dataTemp: record }, ()=>cb())
-
-    onChangeTab = (key, record) => {
-        this.setTab(key, record, () => {
-            Router.push({
-                pathname: '/suratkeluar/baru',
-                query: key==='Nomor'?{ tab: key, _id: record?record._id:'' }:{ tab: key }
+    getListSuratKeluar = () => {
+        this.setState({ loadingDaftar: true }, () => {
+            this.props.socket.emit('api.master_suratkeluar.list/getListSuratKeluar', (response) => {
+                if (response.type === 'OK') {
+                    this.setState({ all_suratkeluar: response.all_suratkeluar, loadingDaftar: false })
+                } else {
+                    this.props.showErrorMessage(response.message)
+                    this.setState({ loadingDaftar: false })
+                }
             })
         })
-        // Router.push({
-        //     pathname: '/suratkeluar/baru',
-        //     query: key==='Nomor'?{ tab: key, _id }:{ tab: key }
-        // })
+    }
+
+    deleteSuratKeluar = (id, cb) => {
+        this.props.socket.emit('api.master_suratkeluar.basic/deleteSuratByNomor', id, (response) => {
+            if (response.type === 'OK') {
+                this.props.showSuccessMessage("Surat berhasil dihapus")
+                this.getListSuratKeluar()
+                cb&&cb()
+            } else this.props.showErrorMessage("Surat gagal dihapus")
+        })
+    }
+
+    setData = (data, cb) => {
+        if (data.tgl_surat) {
+            if (!moment.isMoment(data.tgl_surat)) data.tgl_surat = moment(data.tgl_surat)
+        }
+        this.setState({ data: { ...this.state.data, ...data } }, cb)
+    }
+
+    resetAmbilNomorBaru = () => {
+        Router.push({
+            pathname: '/suratkeluar/baru',
+            query: { tab: 'nomor' }
+        })
+        this.setState({ data: { tgl_surat: moment() } })
+    }
+
+    setRouter = (key, id, id2) => Router.push({
+        pathname: '/suratkeluar/baru',
+        query: (id || id2) && key === 'nomor' ? { tab: key, id: id || id2 } : { tab: key }
+    })
+
+    onChangeTab = (key, id, activeRecord) => {
+        if (activeRecord) {
+            this.setState({
+                activeKey: key,
+                data: activeRecord
+            })
+        } else {
+            this.setState({ activeKey: key })
+        }
+        this.setRouter(key, id, this.state.data ? this.state.data._id : undefined)
+    }
+
+    getSuratByNomor = (id) => {
+        this.props.socket.emit('api.master_suratkeluar.summary/getSuratByNomor', id, (response) => {
+            if (response.type === 'OK') {
+                if (response.suratYgDicari)
+                    this.setData(response.suratYgDicari)
+                else this.props.showErrorMessage('Surat tidak ada')
+            } else {
+                this.props.showErrorMessage(response.message)
+            }
+            this.setState({ loadingRecord: false })
+        })
+    }
+
+    componentDidMount = () => {
+        if (!this.props.router.query.tab) {
+            this.setRouter(tabs[0])
+        }
+        if (this.props.router.query.id && !this.state.data.nomor && this.props.socket) {
+            //getRecord from server
+            this.getSuratByNomor(this.props.router.query.id)
+            //handle if not found/forbidden
+        } else {
+            this.setState({ loadingRecord: false })
+        }
+    }
+
+    componentDidUpdate = (prevProps) => {
+        if (this.props.socket !== prevProps.socket) {
+            this.getSuratByNomor(this.props.router.query.id)
+        }
     }
 
     render() {
-        const { activeKey, dataTemp } = this.state;
+        const { activeKey, data, loadingRecord, all_suratkeluar, loadingDaftar } = this.state;
         const { router } = this.props;
         return (
             <PageHeader
@@ -42,9 +121,28 @@ export default class HomeIndex extends React.Component {
                 title="Surat Keluar"
             >
                 <Tabs defaultActiveKey={router.query.tab} activeKey={activeKey} onChange={this.onChangeTab} animated={false}>
-                    {tabs.map(t => <TabPane tab={`${t.name}`} key={`${t.name}`}>
-                        {<t.Component {...this.props} onChangeTab={this.onChangeTab} tab={router.query.tab} _id={router.query._id} dataTemp={dataTemp} />}
-                    </TabPane>)}
+                    <TabPane tab="Nomor" key="nomor">
+                        <Spin spinning={loadingRecord} delay={500}>
+                            <NomorComp
+                                {...this.props}
+                                data={data}
+                                setData={this.setData}
+                                resetAmbilNomorBaru={this.resetAmbilNomorBaru}
+                                getListSuratKeluar={this.getListSuratKeluar}
+                                deleteSuratKeluar={this.deleteSuratKeluar}
+                            />
+                        </Spin>
+                    </TabPane>
+                    <TabPane tab="Daftar" key="daftar">
+                        <DaftarComp
+                            {...this.props}
+                            onChangeTab={this.onChangeTab}
+                            all_suratkeluar={all_suratkeluar}
+                            loadingDaftar={loadingDaftar}
+                            getListSuratKeluar={this.getListSuratKeluar}
+                            deleteSuratKeluar={this.deleteSuratKeluar}
+                        />
+                    </TabPane>
                 </Tabs>
             </PageHeader>
         )

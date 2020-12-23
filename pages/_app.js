@@ -69,9 +69,9 @@ class MyApp extends App {
       <Provider store={store}>
         <div>
           <Head>
-            <title>SISUKMA - BPS Kab. Kolaka</title>
+            <title>SiSukMa - BPS Kab. Kolaka</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-            <link rel='shortcut icon' type='image/x-icon' href='/static/favicon.ico' />
+            <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
           </Head>
           <Component
             {...pageProps}

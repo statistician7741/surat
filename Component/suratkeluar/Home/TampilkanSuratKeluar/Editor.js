@@ -14,7 +14,7 @@ const formItemLayout = {
     },
 };
 
-const all_seksi = ['Tata Usaha', 'Sosial', 'Produksi', 'Distribusi', 'Nerwilis', 'IPDS', 'Tidak ada']
+const all_seksi = ['Subbagian Umum', 'Sosial', 'Produksi', 'Distribusi', 'Nerwilis', 'IPDS', 'Tidak ada']
 
 export default class Editor extends React.Component {
     state = {
@@ -54,6 +54,8 @@ export default class Editor extends React.Component {
         })
     }
 
+    resetSearchResult = ()=>this.setState({autoCompleteDataSource: []})
+
     componentDidMount = () => {
         this.input && this.input.focus()
         this.formRef.current && this.formRef.current.setFieldsValue(this.props.data)
@@ -63,7 +65,6 @@ export default class Editor extends React.Component {
     render() {
         const { tgl_surat, perihal, tujuan, seksi } = this.props.data;
         const { autoCompleteDataSource, processing } = this.state;
-        console.log(this.props);
         return (
             <Row gutter={[64, 0]}>
                 <Col xs={24} md={24}>
@@ -78,23 +79,24 @@ export default class Editor extends React.Component {
                         <Form.Item
                             label="Tanggal Surat"
                             name="tgl_surat"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Mohon pilih tanggal surat',
-                                },
-                            ]}
-                            hasFeedback
-                            validateStatus={tgl_surat ? "success" : undefined}
+                            // rules={[
+                            //     {
+                            //         required: true,
+                            //         message: 'Mohon pilih tanggal surat',
+                            //     },
+                            // ]}
+                            // hasFeedback
+                            // validateStatus={tgl_surat ? "success" : undefined}
                         >
-                            <DatePicker
+                            {/* <DatePicker
                                 disabledDate={(current) => {
                                     return (current.day() === 0 || current.day() === 6 || current.isAfter(moment()))
                                 }}
                                 format="DD MMMM YYYY"
                                 style={{ width: 200 }}
                                 disabled={processing}
-                            />
+                            /> */}
+                            <strong>{tgl_surat.format('DD/MM/YYYY')}</strong> (hari ini)
                         </Form.Item>
                         <Form.Item
                             label="Perihal"
@@ -114,10 +116,11 @@ export default class Editor extends React.Component {
                                 onSearch={q => this.handleAutoCSearch(q, 'perihal')}
                                 style={{ width: "100%" }}
                                 disabled={processing}
+                                onSelect={this.resetSearchResult}
                             >
                                 <TextArea
                                     ref={this.saveInputRef}
-                                    placeholder="Perihal surat"
+                                    placeholder="Perihal surat..."
                                     style={{ height: 50 }}
                                 />
                             </AutoComplete>
@@ -140,9 +143,10 @@ export default class Editor extends React.Component {
                                 onSearch={q => this.handleAutoCSearch(q, 'tujuan')}
                                 style={{ width: "100%" }}
                                 disabled={processing}
+                                onSelect={this.resetSearchResult}
                             >
                                 <TextArea
-                                    placeholder="Tujuan surat"
+                                    placeholder="Tujuan surat..."
                                     style={{ height: 50 }}
                                 />
                             </AutoComplete>
@@ -159,7 +163,7 @@ export default class Editor extends React.Component {
                             validateStatus={seksi ? "success" : undefined}
 
                         >
-                            <Select style={{ width: 200 }} placeholder="Pilih seksi" disabled={processing}>
+                            <Select style={{ width: 200 }} placeholder="Pilih seksi..." disabled={processing}>
                                 {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
                             </Select>
                         </Form.Item>

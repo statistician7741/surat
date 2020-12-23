@@ -1,40 +1,29 @@
-import { PageHeader, Row } from "antd"
+import { PageHeader } from "antd"
 import dynamic from 'next/dynamic';
 import moment from 'moment';
+import Router from 'next/router'
 
 const Editor = dynamic(() => import("./Editor"));
 const Summary = dynamic(() => import("./Summary"));
 
 export default class Index extends React.Component {
-    state = {
-        activePage: 'ambil-nomor-baru',
-        activeTitle: 'Nomor Surat Baru',
-        data: {
-            nomor: undefined,
-            tgl_surat: moment(),
-            perihal: undefined,
-            tujuan: undefined,
-            seksi: undefined
-        }
+
+    onSwitchPage = (activePage, cb) => {
+        this.setState({ activePage })
     }
 
-    setData = (data, cb)=>this.setState({data: {...this.state.data, ...data}}, cb)
-
-    onSwitchPage = (activePage)=>this.setState({activePage})
-
     render() {
-        const { activePage, activeTitle, data } = this.state;
-        const { _id } = this.props;
+        const { data } = this.props;
         return (
             <PageHeader
                 className="site-page-header"
-                subTitle={activePage === 'ambil-nomor-baru' ? "Nomor Surat" : `${activeTitle}`}
-                onBack={activePage === 'ambil-nomor-baru' ? undefined : ()=>{ this.setState({data: {tgl_surat: moment()}}, ()=>this.onSwitchPage('ambil-nomor-baru')) }}
+                subTitle={!data.nomor ? "Nomor Surat Baru" : 'Informasi Nomor'}
+                onBack={!data.nomor ? undefined : this.props.resetAmbilNomorBaru}
                 ghost={false}
             >
-                {activePage === 'ambil-nomor-baru' && !_id ?
-                    <Editor onSwitchPage={this.onSwitchPage} setData={this.setData} data={data} {...this.props} /> :
-                    <Summary  setData={this.setData} data={data} {...this.props} />}
+                {!data.nomor ?
+                    <Editor onSwitchPage={this.onSwitchPage} {...this.props} />
+                    : <Summary {...this.props} />}
             </PageHeader>
         )
     }
