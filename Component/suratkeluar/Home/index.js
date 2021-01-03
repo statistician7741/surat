@@ -22,7 +22,26 @@ export default class HomeIndex extends React.Component {
             seksi: undefined
         },
         all_suratkeluar: [],
-        loadingDaftar: false
+        loadingDaftar: false,
+        isEditing: false,
+        minDate: undefined,
+        maxDate: undefined
+    }
+
+    toggleEditing = (_id, cb) => {
+        this.props.socket.emit('api.master_suratkeluar.summary/getConstraintDate', _id, (response) => {
+            console.log(response);
+            return
+            if (response.type === 'OK') {
+                this.setState({ all_suratkeluar: response.all_suratkeluar, loadingDaftar: false })
+            } else {
+                this.props.showErrorMessage(response.message)
+                this.setState({ loadingDaftar: false })
+            }
+        })
+        // this.setState({ isEditing: !this.state.isEditing }, () => {
+        //     cb && cb()
+        // })
     }
 
     getListSuratKeluar = () => {
@@ -43,16 +62,18 @@ export default class HomeIndex extends React.Component {
             if (response.type === 'OK') {
                 this.props.showSuccessMessage("Surat berhasil dihapus")
                 this.getListSuratKeluar()
-                cb&&cb()
+                cb && cb()
             } else this.props.showErrorMessage("Surat gagal dihapus")
         })
     }
 
-    setData = (data, cb) => {
+    setData = (data, action) => {
         if (data.tgl_surat) {
             if (!moment.isMoment(data.tgl_surat)) data.tgl_surat = moment(data.tgl_surat)
         }
-        this.setState({ data: { ...this.state.data, ...data } }, cb)
+        else if (data.nomor_kosong === true)
+            data.tgl_surat = undefined
+        this.setState({ data: action==='editing'?{ ...this.state.data, ...data }:{ ...data } })
     }
 
     resetAmbilNomorBaru = () => {
@@ -70,9 +91,15 @@ export default class HomeIndex extends React.Component {
 
     onChangeTab = (key, id, activeRecord) => {
         if (activeRecord) {
+            if (activeRecord.tgl_surat) {
+                if (!moment.isMoment(activeRecord.tgl_surat)) activeRecord.tgl_surat = moment(activeRecord.tgl_surat)
+            }
+            else if (activeRecord.nomor_kosong === true)
+                activeRecord.tgl_surat = undefined
             this.setState({
                 activeKey: key,
-                data: activeRecord
+                data: activeRecord,
+                isEditing: false
             })
         } else {
             this.setState({ activeKey: key })
@@ -113,7 +140,7 @@ export default class HomeIndex extends React.Component {
     }
 
     render() {
-        const { activeKey, data, loadingRecord, all_suratkeluar, loadingDaftar } = this.state;
+        const { activeKey, data, loadingRecord, all_suratkeluar, loadingDaftar, isEditing } = this.state;
         const { router } = this.props;
         return (
             <PageHeader
@@ -126,10 +153,12 @@ export default class HomeIndex extends React.Component {
                             <NomorComp
                                 {...this.props}
                                 data={data}
+                                isEditing={isEditing}
                                 setData={this.setData}
                                 resetAmbilNomorBaru={this.resetAmbilNomorBaru}
                                 getListSuratKeluar={this.getListSuratKeluar}
                                 deleteSuratKeluar={this.deleteSuratKeluar}
+                                toggleEditing={this.toggleEditing}
                             />
                         </Spin>
                     </TabPane>

@@ -7,6 +7,10 @@ var SuratKeluarSchema = new Schema({
         type: String,
         required: true
     },
+    "tahun": { //nomor
+        type: Number,
+        required: true
+    },
     "nomor": { //nomor
         type: Number,
         required: true

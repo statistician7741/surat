@@ -2,7 +2,7 @@ const async = require('async')
 const SuratKeluar = require('../../models/SuratKeluar.model');
 
 module.exports = (input, cb, client) => {
-    const tahun_terpilih = '2020'
+    const tahun_terpilih = 2020
     const { tgl_surat, perihal, tujuan, seksi, _id } = input;
     async.auto({
         isExist: cb_isExist => {
@@ -21,7 +21,7 @@ module.exports = (input, cb, client) => {
             if (isExist) {
                 SuratKeluar.updateOne(
                     { _id },
-                    { tgl_surat, perihal, tujuan, seksi, nomor_kosong: false },
+                    { tahun_terpilih, tgl_surat, perihal, tujuan, seksi, nomor_kosong: false },
                     (e, updatedResult) => {
                         if (e)
                             console.log(e)
@@ -30,7 +30,7 @@ module.exports = (input, cb, client) => {
                     })
             } else {
                 SuratKeluar
-                    .findOne({ _id: new RegExp(`^${tahun_terpilih}_`, 'i') })
+                    .findOne({ tahun: tahun_terpilih })
                     .sort('-nomor')
                     .exec((e, lastNomorResult) => {
                         if (e)
@@ -40,6 +40,7 @@ module.exports = (input, cb, client) => {
                                 const nomor_baru = lastNomorResult.nomor + 1
                                 SuratKeluar.create({
                                     _id: `${tahun_terpilih}_${nomor_baru}`,
+                                    tahun: tahun_terpilih,
                                     nomor: nomor_baru,
                                     tgl_surat,
                                     perihal,
@@ -55,6 +56,7 @@ module.exports = (input, cb, client) => {
                             } else {
                                 SuratKeluar.create({
                                     _id: `${tahun_terpilih}_1`,
+                                    tahun: tahun_terpilih,
                                     nomor: 1,
                                     tgl_surat,
                                     perihal,

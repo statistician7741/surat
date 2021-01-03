@@ -66,7 +66,7 @@ export default class Index extends React.Component {
                 key: 'arsip',
                 width: 80,
                 align: 'center',
-                render: (t, r) => r.arsip_filename ? <a href={`/arsip/download/${r.arsip_filename}`} title={r.arsip_filename} download><DownloadOutlined /></a> : null
+                render: (t, r) => r.arsip_filename ? <a href={`/arsip/download/${r.arsip_filename}`} title={r.arsip_filename} download><DownloadOutlined /></a> : '-'
             }, {
                 title: 'Perihal',
                 dataIndex: 'perihal',
@@ -99,7 +99,7 @@ export default class Index extends React.Component {
                 align: 'center',
                 width: 90,
                 render: (_id, record) => <span>
-                    <a onClick={() => this.props.onChangeTab('nomor', _id, { ...record, tgl_surat: moment(record.tgl_surat) })}><EditTwoTone /></a>
+                    <a onClick={() => this.props.onChangeTab('nomor', _id, {...record})}><EditTwoTone /></a>
                     <Divider type="vertical" />
                     <Popconfirm title={`Hapus nomor surat ini?`}okText="Ya" cancelText="Tidak" onConfirm={()=>this.props.deleteSuratKeluar(_id)}>
                         <DeleteTwoTone twoToneColor="#eb2f96" />
@@ -122,6 +122,7 @@ export default class Index extends React.Component {
                                 onChange={this.inputQueryHandler}
                                 onSearch={query => this.setState({ query })}
                                 enterButton
+                                allowClear
                             />
                         </Col>
                     </Row>

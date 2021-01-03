@@ -22,19 +22,12 @@ export default class Editor extends React.Component {
     state = {
         fileList: [],
         uploading: false,
-        isEditing: false,
         autoCompleteDataSource: [],
         processing: false,
         arsipUploaded: false
     }
 
-    toggleEditing = () => {
-        this.setState({ isEditing: !this.state.isEditing }, () => this.input.focus())
-    }
-
-    onChangeInput = (changedValues) => {
-        this.props.setData(changedValues)
-    }
+    onChangeInput = (changedValues) => this.props.setData(changedValues, 'editing')
 
     handleUpload = () => {
         const { fileList, arsipUploaded } = this.state;
@@ -66,6 +59,7 @@ export default class Editor extends React.Component {
                             }]
                         }, () => {
                             this.props.showSuccessMessage('Berhasil diupload')
+                            this.props.getListSuratKeluar()
                         })
                     } else {
                         this.props.showErrorMessage('Gagal mengupload file. Harap hubungi Administrasi.')
@@ -153,8 +147,9 @@ export default class Editor extends React.Component {
     formRef = React.createRef();
     saveInputRef = input => this.input = input
     render() {
-        const { uploading, fileList, isEditing, processing } = this.state;
-        const { _id, nomor, perihal, tujuan, seksi } = this.props.data;
+        const { uploading, fileList, processing } = this.state;
+        const { _id, tgl_surat, nomor, perihal, tujuan, seksi } = this.props.data;
+        const { isEditing } = this.props
         const { autoCompleteDataSource } = this.state;
         const props = {
             onRemove: file => {
@@ -221,8 +216,16 @@ export default class Editor extends React.Component {
                             <Form.Item
                                 label="Tanggal Surat"
                                 name="tgl_surat"
+                                rules={[
+                                    {
+                                        required: isEditing,
+                                        message: 'Mohon isi tanggal surat',
+                                    },
+                                ]}
+                                hasFeedback={isEditing}
+                                validateStatus={tgl_surat ? "success" : undefined}
                             >
-                                <DatePicker format="DD MMMM YYYY" style={{ width: 200 }} disabled />
+                                <DatePicker format="DD MMMM YYYY" style={{ width: 200 }} disabled={!isEditing}/>
                             </Form.Item>
                             <Form.Item
                                 label="Perihal"
@@ -300,7 +303,7 @@ export default class Editor extends React.Component {
                                 }}
                             >
                                 <Space>
-                                    <Button type="primary" onClick={isEditing ? this.onClickSimpan : this.toggleEditing} disabled={isEditing && (!perihal || !tujuan || !seksi)} loading={processing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
+                                    <Button type="primary" onClick={isEditing ? this.onClickSimpan : ()=>this.props.toggleEditing(_id, this.input.focus)} disabled={isEditing && (!tgl_surat || !perihal || !tujuan || !seksi)} loading={processing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
                                     <Popconfirm placement="topRight" title={`Hapus nomor surat ini?`} okText="Ya" cancelText="Tidak" onConfirm={() => this.props.deleteSuratKeluar(_id, this.props.resetAmbilNomorBaru)}>
                                         <Button type="danger">Hapus</Button>
                                     </Popconfirm>

@@ -1,6 +1,7 @@
 const SuratKeluar = require('../../models/SuratKeluar.model');
 
 module.exports = (_id, cb, client) => {
+    const tahun_terpilih = 2020
     if (_id) {
         if (!_id.match(/^\d{4}_\d+$/)) {
             cb({ type: 'error', message: 'Format nomor salah' })
@@ -14,8 +15,9 @@ module.exports = (_id, cb, client) => {
                     else {
                         SuratKeluar.create({
                             _id,
+                            tahun: tahun_terpilih,
                             nomor: _id.match(/\d+$/)[0],
-                            tgl_surat: new Date(),
+                            // tgl_surat: new Date(),
                             nomor_kosong: true
                         }, (err, suratYgDicari) => {
                             if (err)
