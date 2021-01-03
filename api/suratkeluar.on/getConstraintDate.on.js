@@ -2,7 +2,7 @@ const SuratKeluar = require('../../models/SuratKeluar.model');
 const async = require('async')
 
 module.exports = (_id, cb, client) => {
-    const tahun_terpilih = 2020
+    const tahun_terpilih = 2021
     async.auto({
         minDate: (cb_bb) => {
             SuratKeluar.findOne({

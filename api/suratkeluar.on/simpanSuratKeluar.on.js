@@ -2,7 +2,7 @@ const async = require('async')
 const SuratKeluar = require('../../models/SuratKeluar.model');
 
 module.exports = (input, cb, client) => {
-    const tahun_terpilih = 2020
+    const tahun_terpilih = 2021
     const { tgl_surat, perihal, tujuan, seksi, _id } = input;
     async.auto({
         isExist: cb_isExist => {

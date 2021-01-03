@@ -3,7 +3,7 @@ const fs = require('fs');
 const async = require('async')
 
 module.exports = (_id, cb, client) => {
-    const tahun_terpilih = 2020
+    const tahun_terpilih = 2021
     async.auto({
         isLastNomor: (cb_i) => {
             SuratKeluar.findOne({
