@@ -46,7 +46,7 @@ module.exports = (input, cb, client) => {
                                     perihal,
                                     tujuan,
                                     seksi,
-                                    pemohon: { nama: 'Muh. Shamad', nip: '199402242018021001' }
+                                    pemohon: { nama: '(dlm pengembangan)', nip: '199402242018021001' }
                                 }, (err, newNomorResult) => {
                                     if (err)
                                         console.log(err)

@@ -22,16 +22,14 @@ export default class Editor extends React.Component {
         autoCompleteDataSource: []
     }
     onChangeInput = (changedValues) => {
-        this.props.setData(changedValues)
+        this.props.setData(changedValues, 'editing')
     }
 
     ambilNomor = (data) => {
         this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', data, (response) => {
             if (response.type === 'OK') {
-                this.props.setData({ nomor: response.data.nomor, _id: response.data._id }, () => {
-                    this.setState({ processing: false }, () => {
-                        this.props.onSwitchPage('summary');
-                    })
+                this.props.setData({ nomor: response.data.nomor, _id: response.data._id }, 'editing', () => {
+                    this.setState({ processing: false })
                 })
             } else {
                 this.props.showErrorMessage(response.message)

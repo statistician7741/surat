@@ -28,20 +28,25 @@ export default class HomeIndex extends React.Component {
         maxDate: undefined
     }
 
-    toggleEditing = (_id, cb) => {
-        this.props.socket.emit('api.master_suratkeluar.summary/getConstraintDate', _id, (response) => {
-            console.log(response);
-            return
-            if (response.type === 'OK') {
-                this.setState({ all_suratkeluar: response.all_suratkeluar, loadingDaftar: false })
-            } else {
-                this.props.showErrorMessage(response.message)
-                this.setState({ loadingDaftar: false })
-            }
-        })
-        // this.setState({ isEditing: !this.state.isEditing }, () => {
-        //     cb && cb()
-        // })
+    toggleEditing = (_id, justToggle, cb) => {
+        if (!justToggle) {
+            this.props.socket.emit('api.master_suratkeluar.summary/getConstraintDate', _id, (response) => {
+                // console.log(response);
+                // return
+                if (response.type === 'OK') {
+                    this.setState({
+                        ...response.data,
+                        isEditing: !this.state.isEditing
+                    }, cb&&cb)
+                } else {
+                    this.props.showErrorMessage(response.message)
+                }
+            })
+        } else{
+            this.setState({ isEditing: !this.state.isEditing }, () => {
+                cb && cb()
+            })
+        }
     }
 
     getListSuratKeluar = () => {
@@ -71,9 +76,9 @@ export default class HomeIndex extends React.Component {
         if (data.tgl_surat) {
             if (!moment.isMoment(data.tgl_surat)) data.tgl_surat = moment(data.tgl_surat)
         }
-        else if (data.nomor_kosong === true)
+        else if (data.nomor_kosong === true && data.nomor_kosong !== undefined)
             data.tgl_surat = undefined
-        this.setState({ data: action==='editing'?{ ...this.state.data, ...data }:{ ...data } })
+        this.setState({ data: action === 'editing' ? { ...this.state.data, ...data } : { ...data } })
     }
 
     resetAmbilNomorBaru = () => {
@@ -111,7 +116,7 @@ export default class HomeIndex extends React.Component {
         this.props.socket.emit('api.master_suratkeluar.summary/getSuratByNomor', id, (response) => {
             if (response.type === 'OK') {
                 if (response.suratYgDicari)
-                    this.setData(response.suratYgDicari)
+                    this.setData(response.suratYgDicari, 'editing')
                 else this.props.showErrorMessage('Surat tidak ada')
             } else {
                 this.props.showErrorMessage(response.message)
@@ -140,7 +145,7 @@ export default class HomeIndex extends React.Component {
     }
 
     render() {
-        const { activeKey, data, loadingRecord, all_suratkeluar, loadingDaftar, isEditing } = this.state;
+        const { activeKey, data, loadingRecord, all_suratkeluar, loadingDaftar, isEditing, minDate, maxDate } = this.state;
         const { router } = this.props;
         return (
             <PageHeader
@@ -159,6 +164,8 @@ export default class HomeIndex extends React.Component {
                                 getListSuratKeluar={this.getListSuratKeluar}
                                 deleteSuratKeluar={this.deleteSuratKeluar}
                                 toggleEditing={this.toggleEditing}
+                                maxDate={maxDate}
+                                minDate={minDate}
                             />
                         </Spin>
                     </TabPane>

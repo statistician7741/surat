@@ -1,6 +1,7 @@
 import { Row, Col, Typography, Upload, Button, Form, Input, Select, DatePicker, Space, Popconfirm, AutoComplete, Divider } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import axios from 'axios'
+import moment from 'moment'
 const { Text } = Typography
 const { TextArea } = Input
 const { Option } = Select
@@ -23,8 +24,8 @@ export default class Editor extends React.Component {
         fileList: [],
         uploading: false,
         autoCompleteDataSource: [],
-        processing: false,
-        arsipUploaded: false
+        arsipUploaded: false,
+        processing: false
     }
 
     onChangeInput = (changedValues) => this.props.setData(changedValues, 'editing')
@@ -88,7 +89,8 @@ export default class Editor extends React.Component {
     simpan = (data) => {
         this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', data, (response) => {
             if (response.type === 'OK') {
-                this.setState({ processing: false, isEditing: false }, () => {
+                this.props.toggleEditing(undefined, true, () => {
+                    this.setState({processing: false})
                     this.props.showSuccessMessage("Berhasil diupdate")
                     this.props.getListSuratKeluar()
                 })
@@ -149,8 +151,9 @@ export default class Editor extends React.Component {
     render() {
         const { uploading, fileList, processing } = this.state;
         const { _id, tgl_surat, nomor, perihal, tujuan, seksi } = this.props.data;
-        const { isEditing } = this.props
+        const { isEditing, minDate, maxDate } = this.props
         const { autoCompleteDataSource } = this.state;
+        const nomor_surat = `B-${nomor<10?'0'+nomor:nomor}/74041/${tgl_surat.format('MM')}/${tgl_surat.format('YYYY')}`
         const props = {
             onRemove: file => {
                 this.onRemoveFileUploaded({ _id, filename: file.name }, () => {
@@ -187,7 +190,12 @@ export default class Editor extends React.Component {
                                 label="Nomor Surat"
 
                             >
-                                <span style={{ fontSize: 40 }}>{nomor}</span><Text copyable={{ text: nomor, tooltips: ['Copy?', 'Tercopy!'] }}></Text>
+                                {!isEditing ?
+                                    <>
+                                        <span style={{ fontSize: 40 }}>{nomor_surat}</span><Text copyable={{ text: nomor_surat, tooltips: ['Copy?', 'Tercopy!'] }}></Text>
+                                    </>
+                                    : <span>(mohon klik Simpan untuk melihat)</span>}
+
                             </Form.Item>
                             <Form.Item
                                 label="Arsip"
@@ -225,7 +233,15 @@ export default class Editor extends React.Component {
                                 hasFeedback={isEditing}
                                 validateStatus={tgl_surat ? "success" : undefined}
                             >
-                                <DatePicker format="DD MMMM YYYY" style={{ width: 200 }} disabled={!isEditing}/>
+                                <DatePicker
+                                    disabledDate={(current) => {
+                                        return (minDate ? current.isBefore(moment(minDate).startOf('day')) : false)
+                                            || (maxDate ? current.isAfter(moment(maxDate).endOf('day')) : false)
+                                    }}
+                                    format="DD MMMM YYYY"
+                                    style={{ width: 200 }}
+                                    disabled={!isEditing}
+                                />
                             </Form.Item>
                             <Form.Item
                                 label="Perihal"
@@ -303,7 +319,7 @@ export default class Editor extends React.Component {
                                 }}
                             >
                                 <Space>
-                                    <Button type="primary" onClick={isEditing ? this.onClickSimpan : ()=>this.props.toggleEditing(_id, this.input.focus)} disabled={isEditing && (!tgl_surat || !perihal || !tujuan || !seksi)} loading={processing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
+                                    <Button type="primary" onClick={isEditing ? this.onClickSimpan : () => this.props.toggleEditing(_id, false, this.input.focus)} disabled={isEditing && (!tgl_surat || !perihal || !tujuan || !seksi)} loading={processing}>{isEditing ? 'Simpan' : 'Edit'}</Button>
                                     <Popconfirm placement="topRight" title={`Hapus nomor surat ini?`} okText="Ya" cancelText="Tidak" onConfirm={() => this.props.deleteSuratKeluar(_id, this.props.resetAmbilNomorBaru)}>
                                         <Button type="danger">Hapus</Button>
                                     </Popconfirm>
