@@ -16,6 +16,7 @@ var nomor_kosong_mingguan = schedule.scheduleJob(senin_rabu_jumat_jam12malam, ()
                 SuratKeluar.create({
                     _id: `${tahun_terpilih}_${nomor_baru}`,
                     nomor: nomor_baru,
+                    tahun: tahun_terpilih,
                     // tgl_surat: new Date(),
                     nomor_kosong: true
                 }, (err, suratKeluarKosongMingguan) => {
