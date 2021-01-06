@@ -153,7 +153,7 @@ export default class Editor extends React.Component {
         const { _id, tgl_surat, nomor, perihal, tujuan, seksi } = this.props.data;
         const { isEditing, minDate, maxDate } = this.props
         const { autoCompleteDataSource } = this.state;
-        const nomor_surat = `B-${nomor<10?'0'+nomor:nomor}/74041/${tgl_surat.format('MM')}/${tgl_surat.format('YYYY')}`
+        const nomor_surat = tgl_surat?`B-${nomor<10?'00'+nomor:(nomor<100?'0'+nomor:nomor)}/BPS/74041/${tgl_surat.format('MM')}/${tgl_surat.format('YYYY')}`:`${nomor<10?'00'+nomor:(nomor<100?'0'+nomor:nomor)}/BPS/74041/??/${moment().format('YYYY')}`
         const props = {
             onRemove: file => {
                 this.onRemoveFileUploaded({ _id, filename: file.name }, () => {
