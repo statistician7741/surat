@@ -10,7 +10,7 @@ module.exports = (_id, cb, client) => {
                 tahun: tahun_terpilih,
                 nomor: { $lt: _id.match(/\d+$/)[0] },
                 tgl_surat: { $exists: true },
-            }, (e, hasil) => {
+            }).sort('-nomor').exec((e, hasil) => {
                 cb_bb(null, hasil?hasil.tgl_surat:undefined)
             })
         },
@@ -20,7 +20,7 @@ module.exports = (_id, cb, client) => {
                 tahun: tahun_terpilih,
                 nomor: { $gt: _id.match(/\d+$/)[0] },
                 tgl_surat: { $exists: true },
-            }, (e, hasil) => {
+            }).sort('nomor').exec((e, hasil) => {
                 cb_ba(null, hasil?hasil.tgl_surat:undefined)
             })
         }
