@@ -8,8 +8,8 @@ const test = '0,10,20,30,40,50 * * * * *'
 var nomor_kosong_mingguan = schedule.scheduleJob(senin_rabu_jumat_jam12malam, () => {
     const tahun_terpilih = new Date().getFullYear().toString();
     SuratKeluar
-        .findOne({ _id: new RegExp(`^${tahun_terpilih}_`, 'i') })
-        .sort('-_id').exec((err, suratKeluarWithNomorTerakhir) => {
+        .findOne({ tahun: tahun_terpilih })
+        .sort('-nomor').exec((err, suratKeluarWithNomorTerakhir) => {
             // console.log(suratKeluarWithNomorTerakhir);
             if (suratKeluarWithNomorTerakhir) {
                 const nomor_baru = suratKeluarWithNomorTerakhir.nomor + 1;
