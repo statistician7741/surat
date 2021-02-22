@@ -134,7 +134,7 @@ export default class Index extends React.Component {
                                 rowKey='_id'
                                 columns={daftarColumns}
                                 dataSource={all_suratkeluar}
-                                pagination={{ defaultPageSize: 15, showSizeChanger: true, position: 'top', pageSizeOptions: ['15', '30', '50', '100', '200', '500'], showTotal: (total, range) => `${range[0]}-${range[1]} dari ${total} baris` }} />
+                                pagination={{ defaultPageSize: 50, showSizeChanger: true, position: 'top', pageSizeOptions: ['50', '100', '200', '500'], showTotal: (total, range) => `${range[0]}-${range[1]} dari ${total} baris` }} />
                         </Col>
                     </Row>
                 </Col>

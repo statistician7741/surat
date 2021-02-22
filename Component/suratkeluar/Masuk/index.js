@@ -5,7 +5,7 @@ import moment from 'moment'
 
 const { TabPane } = Tabs;
 
-const NomorComp = dynamic(() => import("./View"))
+const NomorComp = dynamic(() => import("./Entri"))
 const DaftarComp = dynamic(() => import("./Daftar"))
 
 const tabs = ['nomor', 'daftar']
@@ -13,10 +13,24 @@ const tabs = ['nomor', 'daftar']
 export default class HomeIndex extends React.Component {
     state = {
         activeKey: undefined,
+        data: {
+            tgl_masuk: moment(),
+            _id: undefined,
+            tgl_surat: undefined,
+            perihal: undefined,
+            pengirim: undefined,
+            arsip: []
+        }
     }
 
+    setData = (data)=>{
+        this.setState({data: { ...data }})
+    }
+
+    resetData = ()=>this.setState({data: { tgl_masuk: moment(), arsip: [] }})
+
     render() {
-        const { activeKey, all_suratmasuk, loadingDaftar } = this.state;
+        const { activeKey, data } = this.state;
         const { router } = this.props;
         return (
             <PageHeader
@@ -28,6 +42,9 @@ export default class HomeIndex extends React.Component {
                         <Spin spinning={false} delay={500}>
                             <NomorComp
                                 {...this.props}
+                                data={data}
+                                setData={this.setData}
+                                resetData={this.resetData}
                             />
                         </Spin>
                     </TabPane>
