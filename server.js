@@ -48,9 +48,11 @@ let runServer = () => {
 
       // server.use('/api/login', require("./api/login.api"));
       server.use('/suratkeluar/arsip', require("./api/arsip.api"));
+      server.use('/suratkeluar/suratmasuk', require("./api/suratmasuk.api"));
 
       //download path
       server.use('/arsip/download', express.static(`${__dirname}/arsip`))
+      server.use('/arsip/suratmasuk/download', express.static(`${__dirname}/arsip/suratmasuk`))
 
       //Kompresi gzip
       const compression = require('compression');
@@ -70,6 +72,7 @@ let runServer = () => {
       io.on('connection', function (client) {
         console.log("Hey, someone connected");
         require('./api/master_suratkeluar.api')(client)
+        require('./api/master_suratmasuk.api')(client)
         require('./api/general.api')(client)
         client.on('disconnect', () => {
           console.log("Hey, someone disconnected");
