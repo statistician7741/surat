@@ -7,7 +7,7 @@ const SuratMasuk = require('../models/SuratMasuk.model');
 const moment = require('moment');
 
 function entri(req, res) {
-    const tahun_terpilih = 2021
+    const tahun = 2021
     const file_path = __dirname + "/../arsip/suratmasuk/";
     const form = new formidable.IncomingForm({
         // multiples: true,
@@ -28,7 +28,8 @@ function entri(req, res) {
             _id,
             tgl_surat,
             perihal,
-            pengirim
+            pengirim,
+            _id_current
         } = fields
         const file_name = files['files[]'] ? `${moment().unix()}_${files['files[]'].name}` : undefined
         const new_name = files['files[]'] ? `${form.uploadDir}${file_name}` : undefined
@@ -36,7 +37,7 @@ function entri(req, res) {
         async.auto({
             removeOldFile: (r_cb) => {
                 if (files['files[]']) {
-                    SuratMasuk.findOne({ _id }, (e, r) => {
+                    SuratMasuk.findOne({ _id: _id_current ? _id_current : _id }, (e, r) => {
                         if (r) {
                             if (r.arsip)
                                 if (fs.existsSync(r.arsip)) {
@@ -51,8 +52,8 @@ function entri(req, res) {
                 }
             },
             isExist: cb_isExist => {
-                if (_id) {
-                    SuratMasuk.findOne({ _id }, (err, result) => {
+                if (_id || _id_current) {
+                    SuratMasuk.findOne({ _id: _id_current ? _id_current : _id }, (err, result) => {
                         if (err) {
                             console.log(err);
                             cb_isExist(err, null)
@@ -65,7 +66,7 @@ function entri(req, res) {
             storeDB: ['isExist', 'removeOldFile', ({ isExist }, cb_storeDB) => {
                 files['files[]'] && fs.rename(files['files[]'].path, new_name, () => { });
                 const q_update = files['files[]'] ? {
-                    tahun_terpilih,
+                    tahun,
                     tgl_masuk,
                     tgl_surat,
                     perihal,
@@ -73,7 +74,7 @@ function entri(req, res) {
                     arsip: new_name,
                     arsip_filename: file_name
                 } : {
-                        tahun_terpilih,
+                        tahun,
                         tgl_masuk,
                         tgl_surat,
                         perihal,
@@ -81,7 +82,7 @@ function entri(req, res) {
                     }
                 if (isExist) {
                     SuratMasuk.updateOne(
-                        { _id },
+                        { _id: _id_current ? _id_current : _id },
                         q_update,
                         (e, updatedResult) => {
                             if (e)
@@ -100,6 +101,45 @@ function entri(req, res) {
                             cb_storeDB(null, newNomorResult)
                     })
                 }
+            }],
+            isIdChanged: ['storeDB', ({ storeDB }, cb_isIdChg) => {
+                if (_id_current) {
+                    SuratMasuk.findByIdAndDelete({ _id: _id_current, tahun }, (e, {
+                        tahun,
+                        tgl_masuk,
+                        tgl_surat,
+                        perihal,
+                        pengirim,
+                        arsip: new_name,
+                        arsip_filename: file_name
+                    }) => {
+                        if (e) {
+                            console.log(e);
+                            cb_r('Mohon hubungi Admin', null)
+                        } else {
+                            const q_update = {
+                                tahun,
+                                tgl_masuk,
+                                tgl_surat,
+                                perihal,
+                                pengirim,
+                                arsip: new_name,
+                                arsip_filename: file_name
+                            }
+                            SuratMasuk.create({
+                                _id,
+                                ...q_update
+                            }, (err, newNomorResult) => {
+                                if (err){
+                                    console.log(err)
+                                    cb_isIdChg('error simpan new id changed', null)
+                                }
+                                else
+                                    cb_isIdChg(null, newNomorResult)
+                            })
+                        }
+                    })
+                } else cb_isIdChg(null, 'id no change')
             }]
         }, (e, f) => {
             if (e) {

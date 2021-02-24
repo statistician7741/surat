@@ -55,9 +55,6 @@ export default class Editor extends React.Component {
 
     setDataToForm = () => {
         this.formRef.current && this.formRef.current.setFieldsValue(this.props.data)
-        setTimeout(() => {
-            this.input && this.input.focus()
-        }, 200)
     }
 
     resetForm = () => {
@@ -65,6 +62,9 @@ export default class Editor extends React.Component {
             this.setState({ fileList: [] }, () => {
                 this.formRef.current && this.formRef.current.resetFields()
                 this.setDataToForm()
+                setTimeout(() => {
+                    this.input && this.input.focus()
+                }, 200)
             })
         })
     }
@@ -81,19 +81,25 @@ export default class Editor extends React.Component {
                 }] : []
                 this.setState({ fileList })
             }
-        } else{
-            this.setState({ fileList:[] })
+        } else {
+            this.setState({ fileList: [] })
         }
     }
 
     componentDidMount = () => {
         this.setArsip()
         this.setDataToForm()
+        this.input && this.input.focus()
     }
 
     componentDidUpdate = (prevProps) => {
         if (prevProps.data !== this.props.data) {
             this.setArsip()
+            // if (this.props.isEditing)
+            //     this.formRef.current && this.formRef.current.setFieldsValue({
+            //         arsip: this.props.data.arsip
+            //     })
+            // else this.setDataToForm()
             this.setDataToForm()
         }
     }
@@ -128,7 +134,6 @@ export default class Editor extends React.Component {
             },
             fileList,
         };
-        console.log(this.props.data, this.state)
         return (
             <PageHeader
                 className="site-page-header"
@@ -207,8 +212,8 @@ export default class Editor extends React.Component {
                                 {isEditing ? <DatePicker
                                     disabledDate={(current) => {
                                         return (
-                                            current.day() === 0 
-                                            || current.day() === 6 
+                                            current.day() === 0
+                                            || current.day() === 6
                                             || current.isAfter(tgl_masuk)
                                         )
                                     }}
@@ -282,10 +287,9 @@ export default class Editor extends React.Component {
                                 ]}
                                 hasFeedback={isEditing}
                                 validateStatus={fileList.length ? true : false}
-                                disabled={processing}
                             >
                                 {isEditing ? <Upload {...props}>
-                                    <Button icon={<UploadOutlined />}>Pilih file</Button>
+                                    <Button disabled={processing} icon={<UploadOutlined />}>Pilih file</Button>
                                 </Upload> : fileList.length ? <a href={fileList[0].url} target="_blank">{fileList[0].name}</a> : '-'}
                             </Form.Item>
                             <Form.Item
@@ -320,7 +324,7 @@ export default class Editor extends React.Component {
                                         title={`Hapus surat ini?`}
                                         okText="Ya"
                                         cancelText="Tidak"
-                                        onConfirm={()=>this.props.deleteSuratMasuk(_id, this.props.resetData)}
+                                        onConfirm={() => this.props.deleteSuratMasuk(_id, this.resetForm)}
                                     >
                                         <Button type="danger">Hapus</Button>
                                     </Popconfirm> : null}

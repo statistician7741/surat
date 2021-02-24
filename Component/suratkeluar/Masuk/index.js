@@ -14,8 +14,10 @@ const tabs = ['entry', 'daftar']
 export default class HomeIndex extends React.Component {
     state = {
         activeKey: undefined,
+        all_suratmasuk: [],
         data: {
             tgl_masuk: moment(),
+            _id_current: undefined,//'B-002/BPS/80000/01/2019',
             _id: undefined,//'B-002/BPS/80000/01/2019',
             tgl_surat: undefined,//moment('02/01/2019', 'DD/MM/YYYY'),
             perihal: undefined,//'Penyampaian Laporan Keuangan ke Inspektorat Utama',
@@ -25,7 +27,8 @@ export default class HomeIndex extends React.Component {
         },
         isEditing: true,
         isSaved: false,
-        processing: false
+        processing: false,
+        loadingDaftar: false,
     }
 
     setData = (data) => {
@@ -39,15 +42,17 @@ export default class HomeIndex extends React.Component {
             if (response.type === 'OK') {
                 cb && cb()
                 this.props.showSuccessMessage("Surat berhasil dihapus")
-                // this.getListSuratKeluar()
+                this.getListSuratMasuk()
             } else this.props.showErrorMessage("Surat gagal dihapus")
         })
     }
 
     resetData = (cb) => {
         this.setState({
+            all_suratmasuk: [],
             data: {
                 tgl_masuk: moment(),
+                _id_current: undefined,
                 _id: undefined,
                 tgl_surat: undefined,
                 perihal: undefined,
@@ -58,12 +63,12 @@ export default class HomeIndex extends React.Component {
             isSaved: false,
             isEditing: true,
             loadingRecord: false
-        }, ()=>{
+        }, () => {
             Router.push({
-                pathname: '/suratkeluar/masuk',
+                pathname: '/suratmasuk',
                 query: { tab: 'entry' }
             })
-            cb && cb
+            cb && cb()
         })
     }
 
@@ -72,7 +77,8 @@ export default class HomeIndex extends React.Component {
     handleSimpan = (fileList) => {
         this.setState({ processing: true }, () => {
             const {
-                data: { tgl_masuk, _id, tgl_surat, perihal, pengirim, arsip }
+                data: { tgl_masuk, _id, tgl_surat, perihal, pengirim, _id_current },
+                isSaved
             } = this.state
             if (fileList.length === 0) {
                 this.props.showErrorMessage('Mohon pilih file terlebih dahulu')
@@ -85,6 +91,7 @@ export default class HomeIndex extends React.Component {
                     formData.append('files[]', file);
                 });
             }
+            if ((this.state.data._id_current !== _id) && isSaved) formData.append('_id_current', _id_current);
             formData.append('tgl_masuk', tgl_masuk);
             formData.append('_id', _id);
             formData.append('tgl_surat', tgl_surat);
@@ -98,19 +105,20 @@ export default class HomeIndex extends React.Component {
                         this.setState({
                             uploading: false, data: {
                                 ...this.state.data,
-                                arsip: response.data !== 'arsip unchanged'?[{
+                                _id_current: _id,
+                                arsip: response.data !== 'arsip unchanged' ? [{
                                     uid: 1,
                                     name,
                                     status: 'done',
                                     url: `/arsip/suratmasuk/download/${response.data}`
-                                }]:this.state.data.arsip,
-                                arsip_filename: response.data !== 'arsip unchanged'?response.data:this.state.data.arsip_filename
+                                }] : this.state.data.arsip,
+                                arsip_filename: response.data !== 'arsip unchanged' ? response.data : this.state.data.arsip_filename
                             }
                         }, () => {
-                            this.props.showSuccessMessage('Berhasil disimpan.')
+                            this.props.showSuccessMessage('Berhasil disimpan')
+                            this.getListSuratMasuk()
                             this.setState({ processing: false, isEditing: false, isSaved: true })
                             this.setRouter('entry', _id)
-                            // this.props.getListSuratKeluar()
                         })
                     })
                     .catch((error) => {
@@ -123,20 +131,53 @@ export default class HomeIndex extends React.Component {
     }
 
     setRouter = (key, id, id2) => Router.push({
-        pathname: '/suratkeluar/masuk',
+        pathname: '/suratmasuk',
         query: (id || id2) && key === 'entry' ? { tab: key, id: id || id2 } : { tab: key }
     })
 
     getSuratByNomor = (id) => {
         this.props.socket.emit('api.master_suratmasuk.entry/getSuratByNomor', id, (response) => {
             if (response.type === 'OK') {
-                if (response.suratYgDicari)
-                    this.setData(response.suratYgDicari)
+                if (response.suratYgDicari) {
+                    this.setState({
+                        isEditing: false,
+                        isSaved: true,
+                    }, () => {
+                        this.setData({ ...response.suratYgDicari, _id_current: response.suratYgDicari._id })
+                    })
+                }
                 else this.props.showErrorMessage('Surat tidak ada')
             } else {
                 this.props.showErrorMessage('Surat tidak ada')
             }
-            this.setState({ loadingRecord: false, isEditing: false, isSaved: true })
+            this.setState({
+                loadingRecord: false
+            })
+        })
+    }
+
+    onChangeTab = (key, id, activeRecord) => {
+        if (activeRecord) {
+            this.setState({
+                activeKey: key,
+                isEditing: true
+            }, ()=>this.setData(activeRecord))
+        } else {
+            this.setState({ activeKey: key })
+        }
+        this.setRouter(key, id, this.state.data ? this.state.data._id : undefined)
+    }
+
+    getListSuratMasuk = () => {
+        this.setState({ loadingDaftar: true }, () => {
+            this.props.socket.emit('api.master_suratmasuk.list/getListSuratMasuk', (response) => {
+                if (response.type === 'OK') {
+                    this.setState({ all_suratmasuk: response.all_suratmasuk, loadingDaftar: false })
+                } else {
+                    this.props.showErrorMessage(response.message)
+                    this.setState({ loadingDaftar: false })
+                }
+            })
         })
     }
 
@@ -160,7 +201,7 @@ export default class HomeIndex extends React.Component {
     }
 
     render() {
-        const { activeKey, data, isEditing, isSaved, processing, loadingRecord } = this.state;
+        const { activeKey, data, isEditing, isSaved, processing, loadingRecord, all_suratmasuk, loadingDaftar } = this.state;
         const { router } = this.props;
         return (
             <PageHeader
@@ -187,6 +228,11 @@ export default class HomeIndex extends React.Component {
                     <TabPane tab="Daftar" key="daftar">
                         <DaftarComp
                             {...this.props}
+                            all_suratmasuk = {all_suratmasuk}
+                            loadingDaftar = {loadingDaftar}
+                            getListSuratMasuk = {this.getListSuratMasuk}
+                            onChangeTab={this.onChangeTab}
+                            deleteSuratMasuk={this.deleteSuratMasuk}
                         />
                     </TabPane>
                 </Tabs>

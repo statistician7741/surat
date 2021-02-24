@@ -8,6 +8,10 @@ var SuratMasukSchema = new Schema({
         type: String,
         required: true
     },
+    "tahun": {
+        type: Number,
+        required: true
+    },
     "tgl_masuk": {
         type: Date,
         required: true
@@ -40,6 +44,6 @@ var SuratMasukSchema = new Schema({
 
 module.exports = mongoose.model('SuratMasuk', SuratMasukSchema);
 
-SuratMasukSchema.virtual('tahun').get(function () {
-    return moment(this.tgl_masuk).format('YYYY')
-});
+// SuratMasukSchema.virtual('tahun').get(function () {
+//     return moment(this.tgl_masuk).format('YYYY')
+// });
