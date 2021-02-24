@@ -47,10 +47,11 @@ export default class Index extends React.Component {
                 render: (t, r) => t ? moment(t).format('DD/MM/YYYY') : '-'
             }, 
             {
-                title: 'Nomor',
+                title: 'Nomor Surat',
                 dataIndex: '_id',
                 key: '_id',
-                width: 160,
+                width: 125,
+                align: 'right',
                 filteredValue: query || "",
                 onFilter: (query, record) => (
                     this.filter(record._id, query)
@@ -85,10 +86,10 @@ export default class Index extends React.Component {
                 width: 300,
                 render: (perihal, r) => r.nomor_kosong ? `-` : perihal
             }, {
-                title: 'Pengentry',
+                title: 'Pengentri',
                 dataIndex: 'pengentri',
                 key: 'pengentri',
-                width: 300,
+                width: 120,
                 render: (t, r) => '(on progress)'
             },
             {
@@ -130,7 +131,7 @@ export default class Index extends React.Component {
                         <Col xs={24} sm={24}>
                             <Table
                                 loading={false}
-                                scroll={{ x: 1450 }}
+                                scroll={{ x: 1400 }}
                                 rowKey='_id'
                                 columns={daftarColumns}
                                 dataSource={all_suratmasuk}
