@@ -161,7 +161,7 @@ export default class HomeIndex extends React.Component {
             this.setState({
                 activeKey: key,
                 isEditing: true
-            }, ()=>this.setData(activeRecord))
+            }, ()=>this.setData({activeRecord, _id_current: activeRecord._id}))
         } else {
             this.setState({ activeKey: key })
         }

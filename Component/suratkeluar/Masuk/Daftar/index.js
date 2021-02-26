@@ -50,7 +50,7 @@ export default class Index extends React.Component {
                 title: 'Nomor Surat',
                 dataIndex: '_id',
                 key: '_id',
-                width: 125,
+                width: 150,
                 align: 'right',
                 filteredValue: query || "",
                 onFilter: (query, record) => (
