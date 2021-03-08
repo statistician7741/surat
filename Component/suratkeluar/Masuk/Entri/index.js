@@ -81,6 +81,14 @@ export default class Editor extends React.Component {
                 }] : []
                 this.setState({ fileList })
             }
+        } else if (this.props.data.arsip_filename) {
+            const fileList = this.props.data.arsip_filename ? [{
+                uid: 1,
+                name: this.props.data.arsip_filename,
+                status: 'done',
+                url: `/arsip/suratmasuk/download/${this.props.data.arsip_filename}`
+            }] : []
+            this.setState({ fileList })
         } else {
             this.setState({ fileList: [] })
         }
