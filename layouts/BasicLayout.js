@@ -32,7 +32,7 @@ export default class BasicLayout extends React.Component {
       <Layout style={{ minHeight: '100vh' }}>
         <Layout>
           <Header style={{ background: "#fff", padding: 0, textAlign: "center" }}>
-            <span style={{ float: "left", paddingLeft: 25 }}><Link href="/suratkeluar"><a><img className="logo" src={`/logo.png`} /></a></Link></span>
+            <span style={{ float: "left", paddingLeft: 25 }}><a href="/"><img className="logo" src={`/logo.png`} /></a></span>
             <span className="right">
               <Dropdown overlay={menu}>
                 <span className={`action account`}>
