@@ -306,7 +306,7 @@ export default class Editor extends React.Component {
                                 </AutoComplete>
                             </Form.Item>
                             <Form.Item
-                                label="Seksi"
+                                label="Fungsi"
                                 name="seksi"
                                 rules={[
                                     {

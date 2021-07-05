@@ -80,7 +80,7 @@ export default class Index extends React.Component {
                 width: 300,
                 render: (perihal, r) => r.nomor_kosong ? `-` : perihal
             }, {
-                title: 'Seksi',
+                title: 'Fungsi',
                 dataIndex: 'seksi',
                 key: 'seksi',
                 width: 120,
