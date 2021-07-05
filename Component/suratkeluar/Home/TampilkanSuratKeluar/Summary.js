@@ -311,13 +311,13 @@ export default class Editor extends React.Component {
                                 rules={[
                                     {
                                         required: isEditing,
-                                        message: 'Mohon pilih seksi',
+                                        message: 'Mohon pilih fungsi',
                                     },
                                 ]}
                                 hasFeedback={isEditing}
                                 validateStatus={seksi ? "success" : undefined}
                             >
-                                <Select placeholder="Pilih seksi" style={{ width: 200 }} disabled={!isEditing}>
+                                <Select placeholder="Pilih fungsi" style={{ width: 200 }} disabled={!isEditing}>
                                     {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
                                 </Select>
                             </Form.Item>

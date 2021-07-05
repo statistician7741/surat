@@ -161,7 +161,7 @@ export default class Editor extends React.Component {
                             validateStatus={seksi ? "success" : undefined}
 
                         >
-                            <Select style={{ width: 200 }} placeholder="Pilih seksi..." disabled={processing}>
+                            <Select style={{ width: 200 }} placeholder="Pilih fungsi..." disabled={processing}>
                                 {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
                             </Select>
                         </Form.Item>
