@@ -1,1 +1,1 @@
-set NODE_ENV=production&&node server.js
+set NODE_ENV=production&&pm2 start server.js --name Sisukma
