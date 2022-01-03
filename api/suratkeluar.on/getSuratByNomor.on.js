@@ -1,7 +1,7 @@
 const SuratKeluar = require('../../models/SuratKeluar.model');
 
 module.exports = (_id, cb, client) => {
-    const tahun_terpilih = 2021
+    const tahun_terpilih = 2022
     if (_id) {
         if (!_id.match(/^\d{4}_\d+$/)) {
             cb({ type: 'error', message: 'Format nomor salah' })

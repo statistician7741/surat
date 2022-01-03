@@ -1,7 +1,7 @@
 const SuratMasuk = require('../../models/SuratMasuk.model');
 
 module.exports = (_id, cb, client) => {
-    const tahun_terpilih = 2021
+    const tahun_terpilih = 2022
     if (_id) {
         SuratMasuk.findOne({ _id }).exec((e, suratYgDicari) => {
             if (e) {

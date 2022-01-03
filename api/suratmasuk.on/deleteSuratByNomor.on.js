@@ -3,7 +3,7 @@ const fs = require('fs');
 const async = require('async')
 
 module.exports = (_id, cb, client) => {
-    const tahun_terpilih = 2021
+    const tahun_terpilih = 2022
     async.auto({
         removeNomor: (cb_r) => {
             SuratMasuk.findByIdAndDelete({ _id, tahun_terpilih }, (e, suratYgAkanDihapus) => {

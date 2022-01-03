@@ -7,7 +7,7 @@ const SuratMasuk = require('../models/SuratMasuk.model');
 const moment = require('moment');
 
 function entri(req, res) {
-    const tahun = 2021
+    const tahun = 2022
     const file_path = __dirname + "/../arsip/suratmasuk/";
     const form = new formidable.IncomingForm({
         // multiples: true,
