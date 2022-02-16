@@ -5,7 +5,7 @@ export default class extends React.Component {
   static async getInitialProps({ req, res }) {
     if (res) {
       res.writeHead(302, {
-        Location: `http://${req.hostname}/suratkeluar`
+        Location: `${process.env.NODE_ENV !== 'production'?'http:':'https:'}//${req.hostname}/suratkeluar`
       })
       res.end()
     } else {

@@ -20,8 +20,8 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
 let runServer = () => {
-  const port = 83
   const dev = process.env.NODE_ENV !== 'production'
+  const port = dev?80:83
   const app = next({ dev })
   const handle = app.getRequestHandler()
 
