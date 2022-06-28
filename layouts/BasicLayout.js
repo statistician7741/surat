@@ -1,31 +1,31 @@
-import { Layout, Menu, Dropdown, Avatar } from "antd";
+import { Layout, Menu, Dropdown, message } from "antd";
 const { Content, Footer, Header } = Layout;
 
-import { ControlFilled, DashboardFilled } from '@ant-design/icons'
+import { ControlFilled, DashboardFilled, LogoutOutlined } from '@ant-design/icons'
 import Link from "next/link";
 
 import "./BasicLayout.less"
-
+const domain_sso = 'https://sso.bpskolaka.com;'//'http://localhost:3000'
 
 export default class BasicLayout extends React.Component {
   render() {
     const menu = (
       <Menu className={'menu'} selectedKeys={[]}>
-        <Menu.Item key="userCenter">
+        <Menu.Item key="sk">
           <a href='/suratkeluar'>
             <div><ControlFilled /> Surat Keluar</div>
           </a>
         </Menu.Item>
-        <Menu.Item key="userCenter">
+        <Menu.Item key="sm">
           <a href='/suratmasuk'>
             <div><DashboardFilled /> Surat Masuk</div>
           </a>
         </Menu.Item>
-        {/* <Menu.Item key="userCenter">
-          <Link href='/api/login/out'>
-            <div><Icon type="logout" /> Logout</div>
-          </Link>
-        </Menu.Item> */}
+        <Menu.Item key="l">
+          <a href={`${domain_sso}/keluar?next=http://localhost/`}>
+            <div><LogoutOutlined /> Keluar</div>
+          </a>
+        </Menu.Item>
       </Menu>
     );
     return (

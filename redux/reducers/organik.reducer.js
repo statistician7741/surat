@@ -1,6 +1,6 @@
 import * as actionTypes from "../types/organik.type";
 
-export default (
+const OrganikReducer = () => (
   state = {
     active_user: {},
     organik_all: [],
@@ -39,3 +39,5 @@ export default (
     default: return state
   }
 };
+
+export default OrganikReducer;

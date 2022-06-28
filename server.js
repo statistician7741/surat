@@ -57,6 +57,21 @@ let runServer = () => {
       //Kompresi gzip
       const compression = require('compression');
       server.use(compression());
+      const jwt = require('jsonwebtoken');
+      const sso_domain = process.env.NODE_ENV === 'production'?'https://sso.bpskolaka.com/':'http://localhost:3000/';
+      const sisukma_domain = process.env.NODE_ENV === 'production'?'https://sisukma.bpskolaka.com/':'http://localhost/';
+      let login_check = function (req, res, next) {
+        const jwtString = req.cookies['jwt']
+        if(jwtString){
+          jwt.verify(jwtString, 'aigeqwib', function(err, data) {
+            if(err) res.redirect(sso_domain+'?next='+sisukma_domain)
+            else next()
+          });
+        } else {
+          res.redirect(sso_domain+'?next='+sisukma_domain)
+        }
+      }
+      server.use(login_check)
 
       server.get('*', (req, res) => {
         return handle(req, res)
@@ -83,6 +98,8 @@ let runServer = () => {
 
 //modul mongodb utk koneksi mongo db database
 const { exec } = require('child_process');
+const { nest } = require('recompose');
+const e = require('express');
 
 let start = () => {
   mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {

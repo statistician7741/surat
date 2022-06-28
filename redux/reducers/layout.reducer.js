@@ -1,6 +1,6 @@
 import * as actionTypes from "../types/layout.type";
 
-export default (
+const LayoutReducer = () => (
   state = {
     sideMenuCollapsed: false,
   },
@@ -15,3 +15,5 @@ export default (
     default: return state
   }
 };
+
+export default LayoutReducer;

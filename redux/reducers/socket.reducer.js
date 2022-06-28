@@ -1,6 +1,6 @@
 import * as actionTypes from "../types/socket.type";
 
-export default (
+const SocketReducer = () => (
   state = {
     socket: null,
   },
@@ -15,3 +15,5 @@ export default (
     default: return state
   }
 };
+
+export default SocketReducer;
