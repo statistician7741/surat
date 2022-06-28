@@ -5,7 +5,7 @@ import { ControlFilled, DashboardFilled, LogoutOutlined } from '@ant-design/icon
 import Link from "next/link";
 
 import "./BasicLayout.less"
-const domain_sso = 'https://sso.bpskolaka.com;'//'http://localhost:3000'
+const domain_sso = 'https://sso.bpskolaka.com'//'http://localhost:3000'
 
 export default class BasicLayout extends React.Component {
   render() {
