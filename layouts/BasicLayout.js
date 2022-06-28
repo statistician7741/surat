@@ -2,7 +2,6 @@ import { Layout, Menu, Dropdown, message } from "antd";
 const { Content, Footer, Header } = Layout;
 
 import { ControlFilled, DashboardFilled, LogoutOutlined } from '@ant-design/icons'
-import Link from "next/link";
 
 import "./BasicLayout.less"
 const domain_sso = 'https://sso.bpskolaka.com'//'http://localhost:3000'
