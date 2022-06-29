@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import BasicLayout from "../../layouts/BasicLayout";
 
 import dynamic from 'next/dynamic';
-import Layout from 'antd/lib/layout/layout';
 
 const Masuk = dynamic(() => import("../../Component/suratkeluar/Masuk"));
 

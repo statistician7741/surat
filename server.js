@@ -21,8 +21,10 @@ const MongoStore = require('connect-mongo')(session);
 
 let runServer = () => {
   const dev = process.env.NODE_ENV !== 'production'
-  const port = dev?80:83
-  const app = next({ dev })
+  const port = dev ? 80 : 83
+  const app = next({
+    dev
+  })
   const handle = app.getRequestHandler()
 
   app.prepare()
@@ -36,11 +38,15 @@ let runServer = () => {
         resave: true,
         saveUninitialized: true,
         secret: "ID==&&%^&A&SHBJSAsjhbJGhUGkbKiUvii^%^#$%^&98G8UIugg==",
-        store: new MongoStore({ mongooseConnection: mongoose.connection })
+        store: new MongoStore({
+          mongooseConnection: mongoose.connection
+        })
       })
       server.use(sessionWithMongo);
       server.use(cookieParser("ID==&&%^&A&SHBJSAsjhbJGhUGkbKiUvii^%^#$%^&98G8UIugg=="));
-      server.use(bodyParser.urlencoded({ extended: true }));
+      server.use(bodyParser.urlencoded({
+        extended: true
+      }));
       server.use(bodyParser.json())
 
       //socket.io
@@ -58,17 +64,21 @@ let runServer = () => {
       const compression = require('compression');
       server.use(compression());
       const jwt = require('jsonwebtoken');
-      const sso_domain = process.env.NODE_ENV === 'production'?'https://sso.bpskolaka.com/':'http://localhost:3000/';
-      const sisukma_domain = process.env.NODE_ENV === 'production'?'https://sisukma.bpskolaka.com/':'http://localhost/';
+      const sso_domain = process.env.NODE_ENV === 'production' ? 'https://sso.bpskolaka.com/' : 'http://localhost:3000/';
+      const sisukma_domain = process.env.NODE_ENV === 'production' ? 'https://sisukma.bpskolaka.com/' : 'http://localhost/';
       let login_check = function (req, res, next) {
-        const jwtString = req.cookies['jwt']
-        if(jwtString){
-          jwt.verify(jwtString, 'aigeqwib', function(err, data) {
-            if(err) res.redirect(sso_domain+'?next='+sisukma_domain)
-            else next()
-          });
+        if (/static|_next/.test(req.url)) {
+          next();
         } else {
-          res.redirect(sso_domain+'?next='+sisukma_domain)
+          const jwtString = req.cookies['jwt']
+          if (jwtString) {
+            jwt.verify(jwtString, 'aigeqwib', function (err, data) {
+              if (err) res.redirect(sso_domain + '?next=' + sisukma_domain)
+              else next()
+            });
+          } else {
+            res.redirect(sso_domain + '?next=' + sisukma_domain)
+          }
         }
       }
       server.use(login_check)
@@ -97,12 +107,19 @@ let runServer = () => {
 }
 
 //modul mongodb utk koneksi mongo db database
-const { exec } = require('child_process');
-const { nest } = require('recompose');
+const {
+  exec
+} = require('child_process');
+const {
+  nest
+} = require('recompose');
 const e = require('express');
 
 let start = () => {
-  mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+  mongoose.connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }, (err) => {
     if (err) {
       exec(`powershell -Command "Start-Process cmd -Verb RunAs -ArgumentList '/c net start MongoDB'"`, (err, stdout, stderr) => {
         console.log('Trying to start MongoDB service...');

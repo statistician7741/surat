@@ -3,7 +3,9 @@ const SuratKeluar = require('../../models/SuratKeluar.model');
 
 module.exports = (input, cb, client) => {
     const tahun_terpilih = 2022
-    const { tgl_surat, perihal, tujuan, seksi, _id } = input;
+    const { tgl_surat, perihal, tujuan, seksi, _id, pemohon } = input;
+    console.log(input);
+    return;
     async.auto({
         isExist: cb_isExist => {
             if (_id) {
@@ -21,7 +23,7 @@ module.exports = (input, cb, client) => {
             if (isExist) {
                 SuratKeluar.updateOne(
                     { _id },
-                    { tahun_terpilih, tgl_surat, perihal, tujuan, seksi, nomor_kosong: false },
+                    { tahun_terpilih, tgl_surat, perihal, tujuan, seksi, nomor_kosong: false, pemohon },
                     (e, updatedResult) => {
                         if (e)
                             console.log(e)
@@ -46,7 +48,7 @@ module.exports = (input, cb, client) => {
                                     perihal,
                                     tujuan,
                                     seksi,
-                                    pemohon: { nama: '(dlm pengembangan)', nip: '199402242018021001' }
+                                    pemohon
                                 }, (err, newNomorResult) => {
                                     if (err)
                                         console.log(err)

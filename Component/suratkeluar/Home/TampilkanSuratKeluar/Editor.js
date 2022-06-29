@@ -1,5 +1,4 @@
-import { Row, Col, Button, Form, Input, Select, DatePicker, AutoComplete } from 'antd'
-import moment from 'moment'
+import { Row, Col, Button, Form, Input, Select, AutoComplete } from 'antd'
 const { TextArea } = Input
 const { Option } = Select
 
@@ -26,7 +25,7 @@ export default class Editor extends React.Component {
     }
 
     ambilNomor = (data) => {
-        this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', data, (response) => {
+        this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', {...data, ...this.props.pemohon}, (response) => {
             if (response.type === 'OK') {
                 this.props.setData({ nomor: response.data.nomor, _id: response.data._id }, 'editing', () => {
                     this.setState({ processing: false })
