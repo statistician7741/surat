@@ -25,7 +25,7 @@ export default class Editor extends React.Component {
     }
 
     ambilNomor = (data) => {
-        this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', {...data, ...this.props.pemohon}, (response) => {
+        this.props.socket.emit('api.master_suratkeluar.editor/simpanSuratKeluar', {...data, pemohon: this.props.pemohon}, (response) => {
             if (response.type === 'OK') {
                 this.props.setData({ nomor: response.data.nomor, _id: response.data._id }, 'editing', () => {
                     this.setState({ processing: false })

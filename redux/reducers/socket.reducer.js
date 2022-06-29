@@ -1,6 +1,6 @@
 import * as actionTypes from "../types/socket.type";
 
-const SocketReducer = () => (
+const SocketReducer = (
   state = {
     socket: null,
   },

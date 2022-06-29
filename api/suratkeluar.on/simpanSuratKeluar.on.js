@@ -4,8 +4,6 @@ const SuratKeluar = require('../../models/SuratKeluar.model');
 module.exports = (input, cb, client) => {
     const tahun_terpilih = 2022
     const { tgl_surat, perihal, tujuan, seksi, _id, pemohon } = input;
-    console.log(input);
-    return;
     async.auto({
         isExist: cb_isExist => {
             if (_id) {

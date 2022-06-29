@@ -1,6 +1,6 @@
 import * as actionTypes from "../types/layout.type";
 
-const LayoutReducer = () => (
+const LayoutReducer = (
   state = {
     sideMenuCollapsed: false,
   },
