@@ -72,7 +72,7 @@ let runServer = () => {
         } else {
           const jwtString = req.cookies['jwt']
           if (jwtString) {
-            jwt.verify(jwtString, 'aigeqwib', function (err, data) {
+            jwt.verify(jwtString, process.env.NODE_ENV === 'development' ? 'aigeqwib' : '@j4nzky94%@$', function (err, data) {
               if (err) res.redirect(sso_domain + '?next=' + sisukma_domain)
               else next()
             });
