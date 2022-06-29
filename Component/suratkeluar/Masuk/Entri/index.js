@@ -311,7 +311,7 @@ export default class Editor extends React.Component {
 
                                     <Button
                                         type="primary"
-                                        onClick={this.onClickAmbilNomor}
+                                        // onClick={this.onClickAmbilNomor}
                                         loading={processing}
                                         disabled={
                                             !(tgl_masuk
