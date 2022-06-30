@@ -1,5 +1,9 @@
 const async = require('async')
 const SuratKeluar = require('../../models/SuratKeluar.model');
+const config = require('../../env.config');
+const {
+    verify
+} = require('jsonwebtoken');
 
 module.exports = (input, cb, client) => {
     let tahun_terpilih = new Date().getFullYear();

@@ -2,15 +2,15 @@ import * as actionTypes from "../types/layout.type";
 
 const LayoutReducer = (
   state = {
-    sideMenuCollapsed: false,
+    isDev: false,
   },
   action
 ) => {
   switch (action.type) {
-    case actionTypes.TOGGLE_SIDEMENU_COLLAPSED:
+    case actionTypes.SET_ISDEV:
       return {
         ...state,
-        sideMenuCollapsed: action.sideMenuCollapsed
+        isDev: action.isDev
       }
     default: return state
   }

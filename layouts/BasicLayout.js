@@ -4,16 +4,15 @@ const { Content, Footer, Header } = Layout;
 import { ControlFilled, DashboardFilled, LogoutOutlined } from '@ant-design/icons'
 
 import "./BasicLayout.less"
-const domain_sso = 'https://sso.bpskolaka.com'
-// const domain_sso = 'http://localhost:3000'
 
 export default class BasicLayout extends React.Component {
-  state = {z: 'https://sisukma.bpskolaka.com/'}
+  state = {}
   componentDidMount = ()=>{
     this.setState({currentUrl: window.location.href})
   }
   render() {
     const { currentUrl } = this.state;
+    const { isDev } = this.props;
     const menu = (
       <Menu className={'menu'} selectedKeys={[]}>
         <Menu.Item key="sk">
@@ -27,7 +26,7 @@ export default class BasicLayout extends React.Component {
           </a>
         </Menu.Item>
         <Menu.Item key="l">
-          <a href={`${domain_sso}/keluar?next=${currentUrl}`}>
+          <a href={`${isDev? 'http://localhost:3000':'https://sso.bpskolaka.com'}/keluar?next=${currentUrl}`}>
             <div><LogoutOutlined /> Keluar</div>
           </a>
         </Menu.Item>
