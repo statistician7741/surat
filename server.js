@@ -30,6 +30,8 @@ let runServer = () => {
   app.prepare()
     .then(() => {
       const server = express()
+      const cors = require('cors');
+      server.use(cors());
       const cookieParser = require("cookie-parser");
       const bodyParser = require("body-parser");
       var sharedsession = require("express-socket.io-session");
