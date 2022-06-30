@@ -66,14 +66,18 @@ let runServer = () => {
       const jwt = require('jsonwebtoken');
       const sso_domain = process.env.NODE_ENV !== 'development' ? 'https://sso.bpskolaka.com/' : 'http://localhost:3000/';
       const sisukma_domain = process.env.NODE_ENV !== 'development' ? 'https://sisukma.bpskolaka.com/' : 'http://localhost/';
+      const config = require('./env.config')
       let login_check = function (req, res, next) {
         if (/static|_next/.test(req.url)) {
           next();
         } else {
           const jwtString = req.cookies['jwt']
           if (jwtString) {
-            jwt.verify(jwtString, process.env.NODE_ENV === 'development' ? 'aigeqwib' : '@j4nzky94%@$', function (err, data) {
-              if (err) res.redirect(sso_domain + '?next=' + sisukma_domain)
+            jwt.verify(jwtString, process.env.NODE_ENV === 'development' ? config.JWT_SECRET_DEV : config.JWT_SECRET_PROD, function (err, data) {
+              if (err) {
+                console.log(err)
+                res.redirect(sso_domain + '?next=' + sisukma_domain)
+              }
               else next()
             });
           } else {

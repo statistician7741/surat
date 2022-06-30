@@ -14,7 +14,6 @@ class Index extends React.Component {
   static async getInitialProps({ req, res }) {
     if (!!req) {
       const cookies = new Cookies(req, res);
-      console.log(process.env.NODE_ENV === 'development');
       try {
         const config = require('../../env.config')
         const isDev = process.env.NODE_ENV === 'development'

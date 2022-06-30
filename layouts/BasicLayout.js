@@ -12,7 +12,7 @@ export default class BasicLayout extends React.Component {
   }
   render() {
     const { currentUrl } = this.state;
-    const { isDev } = this.props;
+    const { isDev, pemohon } = this.props;
     const menu = (
       <Menu className={'menu'} selectedKeys={[]}>
         <Menu.Item key="sk">
@@ -40,7 +40,7 @@ export default class BasicLayout extends React.Component {
             <span className="right">
               <Dropdown overlay={menu}>
                 <span className={`action account`}>
-                  <span className={'name'}>Menu</span>
+                  <span className={'name'}>{pemohon.nama?pemohon.nama+' | ':''}Menu</span>
                 </span>
               </Dropdown>
             </span>

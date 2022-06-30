@@ -13,7 +13,6 @@ class Index extends React.Component {
   static async getInitialProps({ req, res }) {
     if (!!req) {
       const cookies = new Cookies(req, res);
-      console.log(process.env.NODE_ENV === 'development');
       try {
         const config = require('../../env.config')
         const isDev = process.env.NODE_ENV === 'development'
@@ -40,8 +39,10 @@ class Index extends React.Component {
 }
 
 function mapStateToProps(state) {
-  const { socket } = state.socket
-  return { socket }
+  const { socket } = state.socket;
+  const { pemohon } = state.organik;
+  const { isDev } = state.layout;
+  return { socket, pemohon, isDev };
 }
 
 export default connect(mapStateToProps)(Index)
