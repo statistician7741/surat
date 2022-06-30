@@ -13,12 +13,8 @@ class Index extends React.Component {
   static async getInitialProps({ req, res }) {
     if (!!req) {
       const cookies = new Cookies(req, res);
-      verify(cookies.get('jwt'), '@jabsadz92@#$', function (err, data) {
-        if (err) return {};
-        else return { pemohon: { nip: data.organikId, nama: data.nama } };
-      });
       try {
-        const { organikId, nama } = verify(cookies.get('jwt'), 'aigeqwib');
+        const { organikId, nama } = verify(cookies.get('jwt'), '@j4nzky94%@$');
         return { pemohonTemp: { nip: organikId, nama } };
       } catch (ex) {
         return {};
