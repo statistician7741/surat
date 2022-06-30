@@ -4,8 +4,8 @@ const { Content, Footer, Header } = Layout;
 import { ControlFilled, DashboardFilled, LogoutOutlined } from '@ant-design/icons'
 
 import "./BasicLayout.less"
-// const domain_sso = 'https://sso.bpskolaka.com'
-const domain_sso = 'http://localhost:3000'
+const domain_sso = 'https://sso.bpskolaka.com'
+// const domain_sso = 'http://localhost:3000'
 
 export default class BasicLayout extends React.Component {
   state = {z: 'https://sisukma.bpskolaka.com/'}

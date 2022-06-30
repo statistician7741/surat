@@ -64,8 +64,8 @@ let runServer = () => {
       const compression = require('compression');
       server.use(compression());
       const jwt = require('jsonwebtoken');
-      const sso_domain = process.env.NODE_ENV === 'production' ? 'https://sso.bpskolaka.com/' : 'http://localhost:3000/';
-      const sisukma_domain = process.env.NODE_ENV === 'production' ? 'https://sisukma.bpskolaka.com/' : 'http://localhost/';
+      const sso_domain = process.env.NODE_ENV !== 'development' ? 'https://sso.bpskolaka.com/' : 'http://localhost:3000/';
+      const sisukma_domain = process.env.NODE_ENV !== 'development' ? 'https://sisukma.bpskolaka.com/' : 'http://localhost/';
       let login_check = function (req, res, next) {
         if (/static|_next/.test(req.url)) {
           next();
