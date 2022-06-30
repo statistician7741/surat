@@ -2,7 +2,13 @@ const SuratKeluar = require('../../models/SuratKeluar.model');
 const async = require('async')
 
 module.exports = (_id, cb, client) => {
-    const tahun_terpilih = 2022
+    let tahun_terpilih = new Date().getFullYear();
+    try {
+        const { tahun_anggaran } = verify(client.handshake.cookies.jwt, process.env.NODE_ENV !== 'development' ? config.JWT_SECRET_PROD : config.JWT_SECRET_DEV);
+        tahun_terpilih = tahun_anggaran;
+    } catch (ex) {
+        console.log(ex);
+    }
     async.auto({
         minDate: (cb_bb) => {
             SuratKeluar.findOne({

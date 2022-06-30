@@ -4,7 +4,7 @@
   "description": "",
   "main": "SocketConnections.js",
   "scripts": {
-    "dev": "set NODE_ENV=dev&&nodemon server.js",
+    "dev": "set NODE_ENV=development&&nodemon server.js",
     "build": "next build",
     "start": "set NODE_ENV=production&&node server.js"
   },

@@ -2,7 +2,13 @@ const async = require('async')
 const SuratKeluar = require('../../models/SuratKeluar.model');
 
 module.exports = (input, cb, client) => {
-    const tahun_terpilih = 2022
+    let tahun_terpilih = new Date().getFullYear();
+    try {
+        const { tahun_anggaran } = verify(client.handshake.cookies.jwt, process.env.NODE_ENV !== 'development' ? config.JWT_SECRET_PROD : config.JWT_SECRET_DEV);
+        tahun_terpilih = tahun_anggaran;
+    } catch (ex) {
+        console.log(ex);
+    }
     const { tgl_surat, perihal, tujuan, seksi, _id, pemohon } = input;
     async.auto({
         isExist: cb_isExist => {
