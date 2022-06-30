@@ -8,7 +8,6 @@ import {
   LockFilled,
   LogoutOutlined,
 } from '@ant-design/icons';
-//@J4nzky94@@
 import './BasicLayout.less';
 
 const GantiPassForm = ({
@@ -16,7 +15,7 @@ const GantiPassForm = ({
   isGantiPassModalVisible,
   isDev,
   onClickGantiPassAkun,
-  nip
+  nip,
 }) => {
   const [form] = Form.useForm();
   const onFinish = (data) => {
@@ -24,9 +23,12 @@ const GantiPassForm = ({
       ? 'http://localhost:84'
       : 'https://user-api.bpskolaka.com';
     axios
-      .patch(`${login_api_domain}/v1/organiks/${nip}`, data, {withCredentials: true})
+      .patch(`${login_api_domain}/v1/organiks/${nip}`, data, {
+        withCredentials: true,
+      })
       .then((response) => {
         message.success('Password berhasil disimpan.');
+        onClickGantiPassAkun();
       })
       .catch((error) => {
         console.log(error);
@@ -46,9 +48,9 @@ const GantiPassForm = ({
         onFinish={onFinish}
         autoComplete="off"
         form={form}
-        action={`${isDev
-          ? 'http://localhost:84'
-          : 'https://user-api.bpskolaka.com'}/v1/organiks/${nip}`}
+        action={`${
+          isDev ? 'http://localhost:84' : 'https://user-api.bpskolaka.com'
+        }/v1/organiks/${nip}`}
       >
         <Form.Item
           name="password"
