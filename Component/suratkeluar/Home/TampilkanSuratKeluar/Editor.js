@@ -1,4 +1,4 @@
-import { Row, Col, Button, Form, Input, Select, AutoComplete } from 'antd'
+import { Row, Col, Button, Form, Input, Select, AutoComplete, TreeSelect } from 'antd'
 const { TextArea } = Input
 const { Option } = Select
 
@@ -13,7 +13,102 @@ const formItemLayout = {
     },
 };
 
-const all_seksi = ['Subbagian Umum', 'Sosial', 'Produksi', 'Distribusi', 'Nerwilis', 'IPDS', 'Tidak ada']
+const all_seksi = [
+    { kode: '74041',label:'Subbagian Umum'}, 
+    { kode: '74042',label:'Sosial'}, 
+    { kode: '74043',label:'Produksi'}, 
+    { kode: '74044',label:'Distribusi'}, 
+    { kode: '74045',label:'Nerwilis'}, 
+    { kode: '74046',label:'IPDS'}, 
+    { kode: '74040',label:'BPS Kabupaten Kolaka'},
+]
+const all_klasifikasi_keamanan = [
+    { kode: 'B', label: 'Biasa' },
+    { kode: 'T', label: 'Terbatas' },
+    { kode: 'R', label: 'Rahasia' },
+    { kode: 'SR', label: 'Sangat Rahasia' },
+]
+
+const data = require('../klasifikasi_arsip_data')
+console.log(data);
+
+const klasifikasi_arsip_data = [
+    {
+        value: 'PS - PERUMUSAN KEBIJAKAN DI BIDANG STATISTIK MELIPUTI: METODOLOGI DAN INFORMASI STATISTIK, STATISTIK SOSIAL, STATISTIK PRODUKSI, STATISTIK DISTRIBUSI DAN JASA, NERACA DAN ANALISA STATISTIK',
+        title: 'PS - PERUMUSAN KEBIJAKAN DI BIDANG STATISTIK MELIPUTI: METODOLOGI DAN INFORMASI STATISTIK, STATISTIK SOSIAL, STATISTIK PRODUKSI, STATISTIK DISTRIBUSI DAN JASA, NERACA DAN ANALISA STATISTIK',
+        selectable: false,
+        children: [
+            {
+                value: 'PS.000 - Pengkajian dan Pengusulan Kebijakan',
+                title: 'PS.000 - Pengkajian dan Pengusulan Kebijakan'
+            },
+            {
+                value: 'PS.100 - Penyiapan Kebijakan.',
+                title: 'PS.100 - Penyiapan Kebijakan.'
+            },
+            {
+                value: 'PS.200 - Masukan dan Dukungan dalam Penyusunan Kebijakan.',
+                title: 'PS.200 - Masukan dan Dukungan dalam Penyusunan Kebijakan.'
+            },
+            {
+                value: 'PS.300 - Pengembangan desain dan standardisasi',
+                title: 'PS.300 - Pengembangan desain dan standardisasi'
+            },
+            {
+                value: 'PS.400 - Penetapan Norma, Standar, Prosedur dan Kriteria (NSPK)',
+                title: 'PS.400 - Penetapan Norma, Standar, Prosedur dan Kriteria (NSPK)'
+            },
+        ]
+    },
+    {
+        value: 'SS - SENSUS PENDUDUK, SENSUS PERTANIAN DAN SENSUS EKONOMI',
+        title: 'SS - SENSUS PENDUDUK, SENSUS PERTANIAN DAN SENSUS EKONOMI',
+        selectable: false,
+        children: [
+            {
+                value: 'SS.000 - PERENCANAAN',
+                title: 'SS.000 - PERENCANAAN',
+                children: [
+                    {
+                        value: 'SS.010 - Master Plan dan Network planing',
+                        title: 'SS.010 - Master Plan dan Network planing'
+                    },
+                    {
+                        value: 'SS.020 - Perumusan dan Penyusunan Bahan',
+                        title: 'SS.020 - Perumusan dan Penyusunan Bahan',
+                        children: [
+                            {
+                                value: 'SS.021 - Penyiapan bahan penyusunan rancangan sensus',
+                                title: 'SS.021 - Penyiapan bahan penyusunan rancangan sensus'
+                            },
+                            {
+                                value: 'SS.022 - Penyusunan metode pencacahan sensus',
+                                title: 'SS.022 - Penyusunan metode pencacahan sensus'
+                            },
+                            {
+                                value: 'SS.023 - Penentuan volume sensus',
+                                title: 'SS.023 - Penentuan volume sensus'
+                            },
+                            {
+                                value: 'SS.024 - Penyusunan desain penarikan sampel',
+                                title: 'SS.024 - Penyusunan desain penarikan sampel'
+                            },
+                            {
+                                value: 'SS.025 - Penyusunan Kerangka Sampel',
+                                title: 'SS.025 - Penyusunan Kerangka Sampel'
+                            },
+                        ]
+                    },
+                ]
+            },
+            {
+                value: 'SS.100 - PERSIAPAN SENSUS.',
+                title: 'SS.100 - PERSIAPAN SENSUS.'
+            },
+        ]
+    },
+]
+
 
 export default class Editor extends React.Component {
     state = {
@@ -60,7 +155,7 @@ export default class Editor extends React.Component {
     formRef = React.createRef();
     saveInputRef = input => this.input = input
     render() {
-        const { tgl_surat, perihal, tujuan, seksi } = this.props.data;
+        const { tgl_surat, perihal, tujuan, seksi, klasifikasi_keamanan, klasifikasi_arsip } = this.props.data;
         const { autoCompleteDataSource, processing } = this.state;
         return (
             <Row gutter={[64, 0]}>
@@ -149,7 +244,23 @@ export default class Editor extends React.Component {
                             </AutoComplete>
                         </Form.Item>
                         <Form.Item
-                            label="Fungsi"
+                            label="Klasifikasi Keamanan"
+                            name="klasifikasi_keamanan"
+                            rules={[
+                                {
+                                    required: true
+                                },
+                            ]}
+                            hasFeedback
+                            validateStatus={klasifikasi_keamanan ? "success" : undefined}
+
+                        >
+                            <Select style={{ width: 250 }} placeholder="Pilih derajat pengamanan..." disabled={processing}>
+                                {all_klasifikasi_keamanan.map(klasifikasi => <Option value={klasifikasi.kode} key={klasifikasi.kode}>{klasifikasi.kode} - {klasifikasi.label}</Option>)}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item
+                            label="Nomor Indeks"
                             name="seksi"
                             rules={[
                                 {
@@ -160,9 +271,31 @@ export default class Editor extends React.Component {
                             validateStatus={seksi ? "success" : undefined}
 
                         >
-                            <Select style={{ width: 200 }} placeholder="Pilih fungsi..." disabled={processing}>
-                                {all_seksi.map(seksi => <Option value={seksi} key={seksi}>{seksi}</Option>)}
+                            <Select style={{ width: 250 }} placeholder="Pilih satuan organisasi..." disabled={processing}>
+                                {all_seksi.map(seksi => <Option value={seksi.kode} key={seksi.kode}>{seksi.kode} - {seksi.label}</Option>)}
                             </Select>
+                        </Form.Item>
+                        <Form.Item
+                            label="Klasifikasi Arsip"
+                            name="klasifikasi_arsip"
+                            rules={[
+                                {
+                                    required: true
+                                },
+                            ]}
+                            hasFeedback
+                            validateStatus={klasifikasi_arsip ? "success" : undefined}
+
+                        >
+                            <TreeSelect
+                                showSearch
+                                disabled={processing}
+                                style={{ width: 500 }}
+                                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                placeholder="Pilih kode klasifikasi..."
+                                allowClear
+                                treeData={klasifikasi_arsip_data}
+                            />
                         </Form.Item>
                         <Form.Item
                             wrapperCol={{
