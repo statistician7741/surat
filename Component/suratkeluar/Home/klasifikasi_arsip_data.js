@@ -694,4 +694,46 @@ data.forEach(k => {
   }
 });
 
-module.exports = tree
+let tree_ok = []
+let i0 = 0
+let i1 = 0
+let i2 = 0
+for (const key0 in tree) {
+  if (Object.hasOwnProperty.call(tree, key0)) {
+    i0 += 1
+    i1 = 0
+    tree_ok.push({
+      value: tree[key0].value,
+      title: tree[key0].title,
+    })
+
+    for (const key1 in tree[key0]) {
+      if (Object.hasOwnProperty.call(tree[key0], key1) && key1 !== 'value' && key1 !== 'title') {
+        if(!tree_ok[i0-1].children) {
+          tree_ok[i0-1].children = []
+        }
+        i1 += 1
+        i2 = 0
+        tree_ok[i0-1].children.push({
+          value: tree[key0][key1].value,
+          title: tree[key0][key1].title,
+        })
+
+        for (const key2 in tree[key0][key1]) {
+          if (Object.hasOwnProperty.call(tree[key0][key1], key2) && key2 !== 'value' && key2 !== 'title') {
+            if(!tree_ok[i0-1].children[i1-1].children) {
+              tree_ok[i0-1].children[i1-1].children = []
+            }
+            i2 += 1
+            tree_ok[i0-1].children[i1-1].children.push({
+              value: tree[key0][key1][key2].value,
+              title: tree[key0][key1][key2].title,
+            })
+          }
+        }
+      }
+    }
+  }
+}
+
+module.exports = tree_ok
