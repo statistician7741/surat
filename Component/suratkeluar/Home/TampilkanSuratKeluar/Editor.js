@@ -225,7 +225,7 @@ export default class Editor extends React.Component {
                                 sm: { span: 12, offset: 6 },
                             }}
                         >
-                            <Button type="primary" onClick={this.onClickAmbilNomor} disabled={!tgl_surat || !perihal || !tujuan || !seksi} loading={processing}>Ambil Nomor Baru</Button>
+                            <Button type="primary" onClick={this.onClickAmbilNomor} disabled={!tgl_surat || !perihal || !tujuan || !seksi || !klasifikasi_keamanan || !klasifikasi_arsip} loading={processing}>Ambil Nomor Baru</Button>
                         </Form.Item>
                     </Form>
                 </Col>

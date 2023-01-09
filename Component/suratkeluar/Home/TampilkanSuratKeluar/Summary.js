@@ -478,7 +478,7 @@ export default class Editor extends React.Component {
                         : () => this.onClickEdit(_id)
                     }
                     disabled={
-                      isEditing && (!tgl_surat || !perihal || !tujuan || !seksi)
+                      isEditing && (!tgl_surat || !perihal || !tujuan || !seksi || !klasifikasi_keamanan || !klasifikasi_arsip)
                     }
                     loading={processing}
                   >
