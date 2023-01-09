@@ -450,7 +450,7 @@ export default class Editor extends React.Component {
                     message: 'Mohon pilih klasifikasi arsip',
                   },
                 ]}
-                hasFeedback
+                hasFeedback={isEditing}
                 validateStatus={klasifikasi_arsip ? 'success' : undefined}
               >
                 <TreeSelect
