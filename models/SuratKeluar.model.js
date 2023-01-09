@@ -24,9 +24,6 @@ var SuratKeluarSchema = new Schema({
     "tujuan": {
         type: String,
     },
-    "seksi": {
-        type: String,
-    },
     "pemohon": {
         'nama': String,
         'nip': String
@@ -44,6 +41,16 @@ var SuratKeluarSchema = new Schema({
     "nomor_kosong": {
         'type': Boolean,
         'default': false
+    },
+    "klasifikasi_keamanan": {
+        type: String,
+        'default': 'B'
+    },
+    "seksi": {
+        type: String,
+    },
+    "klasifikasi_arsip": {
+        type: String,
     }
 }, { collection: 'suratkeluar' });
 

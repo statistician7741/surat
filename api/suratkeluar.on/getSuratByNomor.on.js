@@ -17,7 +17,7 @@ module.exports = (_id, cb, client) => {
         if (!_id.match(/^\d{4}_\d+$/)) {
             cb({ type: 'error', message: 'Format nomor salah' })
         } else {
-            SuratKeluar.findOne({ _id }, '_id nomor perihal tujuan pemohon seksi arsip_filename nomor_kosong').exec((e, suratYgDicari) => {
+            SuratKeluar.findOne({ _id }, '_id nomor perihal tujuan pemohon seksi arsip_filename nomor_kosong klasifikasi_keamanan klasifikasi_arsip').exec((e, suratYgDicari) => {
                 if (e) {
                     console.log(e);
                     cb({ type: 'error', message: 'Mohon hubungi Admin' })

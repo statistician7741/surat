@@ -31,7 +31,7 @@ data = [
   'SS.230 - Pelatihan Petugas Pengolahan.',
   'SS.240 - Perancangan Tabel.',
   'SS.250 - Pelaksanaan Ujicoba Kuesioner Sensus (meliputi reliabilitas kuesioner dan sistem pengolahan}.',
-  'SS.260 - Pelaksanaan Ujicoba Kuesioner Metodologi Sensus (meliputi ujicoba pelaksanaan pencacahan, organisasi dan iumlah sampel).',
+  'SS.260 - Pelaksanaan Ujicoba Kuesioner Metodologi Sensus (meliputi ujicoba pelaksanaan pencacahan, organisasi dan jumlah sampel).',
   'SS.300 - PELAKSANAAN LAPANGAN',
   'SS.310 - Listing.',
   'SS.320 - Pemilihan Sampel.',
@@ -83,7 +83,7 @@ data = [
   'VS.230 - Pelatihan Petugas Pengolahan.',
   'VS.240 - Perancangan Tabel.',
   'VS.250 - Pelaksanaan Ujicoba Kuesioner survei (meliputi reliabilitas kuesioner dan sistem pengolahan).',
-  'VS.260 - Pelaksanaan Ujicoba Kuesioner Metodologi survei (meliputi ujicoba pelaksanaan pencacahan, organisasi dan iumlah sampel).',
+  'VS.260 - Pelaksanaan Ujicoba Kuesioner Metodologi survei (meliputi ujicoba pelaksanaan pencacahan, organisasi dan jumlah sampel).',
   'VS.300 - PELAKSANMN LAPANGAN',
   'VS.310 - Listing.',
   'VS.320 - Pemilihan Sampel.',
@@ -582,7 +582,7 @@ data = [
   'PK.230 - Daftar Tambahan Buku (assesion list).',
   'PK.240 - Daftar/Jajaran Kendali (subjek dan pengarang).',
   'PK.300 - LAYANAN JASA PERPUSTAKAAN DAN INFORMASI',
-  'PK.310 - Data dan - 28 -tatistic anggota, pengunjung dan peminjaman bahan pustaka.',
+  'PK.310 - Data dan statistik anggota, pengunjung dan peminjaman bahan pustaka.',
   'PK.320 - Pertanyaan, Rujukan dan Jawaban.',
   'PK.400 - PRESERVASIBAHANPUSTAKA',
   'PK.410 - Survei Kondisi Bahan Pustaka.',
@@ -705,6 +705,7 @@ for (const key0 in tree) {
     tree_ok.push({
       value: tree[key0].value,
       title: tree[key0].title,
+      selectable: false,
     })
 
     for (const key1 in tree[key0]) {

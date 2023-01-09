@@ -53,6 +53,7 @@ export default class Index extends React.Component {
                     || this.filter(record.tujuan ? record.tujuan : undefined, query)
                     || this.filter(record.pemohon ? record.pemohon.nama : undefined, query)
                     || this.filter(record.seksi ? record.seksi : undefined, query)
+                    || this.filter(record.klasifikasi_arsip ? record.klasifikasi_arsip : undefined, query)
                 ),
             }, {
                 title: 'Tanggal Surat',
@@ -90,6 +91,11 @@ export default class Index extends React.Component {
                 key: 'pemohon.nama',
                 width: 300,
                 render: (t, r) => r.pemohon ? r.pemohon.nama : '-'
+            }, {
+                title: 'Klasifikasi Arsip',
+                dataIndex: 'klasifikasi_arsip',
+                key: 'klasifikasi_arsip',
+                render: (t, r) => r.klasifikasi_arsip
             },
             {
                 title: 'Pilihan',
@@ -130,7 +136,7 @@ export default class Index extends React.Component {
                         <Col xs={24} sm={24}>
                             <Table
                                 loading={loadingDaftar}
-                                scroll={{ x: 1450 }}
+                                scroll={{ x: 2000 }}
                                 rowKey='_id'
                                 columns={daftarColumns}
                                 dataSource={all_suratkeluar}
