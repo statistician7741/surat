@@ -21,7 +21,7 @@ const MongoStore = require('connect-mongo')(session);
 
 let runServer = () => {
   const dev = process.env.NODE_ENV !== 'production'
-  const port = dev ? 80 : 83
+  const port = 83
   const app = next({
     dev
   })
