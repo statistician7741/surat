@@ -1,0 +1,13 @@
+services:
+  sisukma:
+    container_name: sisukma
+    image: image_sisukma
+    build: .
+    volumes:
+      - ./arsip/suratmasuk:/arsip/suratmasuk
+    restart: always
+    ports:
+      - '83:83'
+    environment:
+      TZ: Asia/Makassar
+#docker compose up -d

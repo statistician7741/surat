@@ -4,4 +4,5 @@ module.exports = {
   SSO_HOST: 'http://localhost:85',
   SSO_USER_API_HOST: 'http://localhost:84',
   SISUKMA_HOST: 'http://localhost:83',
+  HOST: 'host.docker.internal' //127.0.0.1
 }

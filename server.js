@@ -13,7 +13,7 @@ const next = require('next');
 const socketServer = require('socket.io');
 
 //modul mongodb utk koneksi mongo db database
-const url = 'mongodb://127.0.0.1:27017/bps';
+const url = `mongodb://${config.HOST}:27017/bps`;
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
