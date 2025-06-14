@@ -1,5 +1,6 @@
 import { Layout, Menu, Dropdown, message, Modal, Form, Input } from 'antd';
 import axios from 'axios';
+import config from '../env.config';
 const { Content, Footer, Header } = Layout;
 
 import {
@@ -19,9 +20,7 @@ const GantiPassForm = ({
 }) => {
   const [form] = Form.useForm();
   const onFinish = (data) => {
-    const login_api_domain = isDev
-      ? 'http://localhost:84'
-      : 'https://user-api.bpskolaka.com';
+    const login_api_domain = config.SSO_USER_API_HOST;
     axios
       .patch(`${login_api_domain}/v1/organiks/${nip}`, data, {
         withCredentials: true,
@@ -48,9 +47,7 @@ const GantiPassForm = ({
         onFinish={onFinish}
         autoComplete="off"
         form={form}
-        action={`${
-          isDev ? 'http://localhost:84' : 'https://user-api.bpskolaka.com'
-        }/v1/organiks/${nip}`}
+        action={`${config.SSO_USER_API_HOST}/v1/organiks/${nip}`}
       >
         <Form.Item
           name="password"
@@ -121,9 +118,7 @@ export default class BasicLayout extends React.Component {
         </Menu.Item>
         <Menu.Item key="l">
           <a
-            href={`${
-              isDev ? 'http://localhost:3000' : 'https://sso.bpskolaka.com'
-            }/keluar?next=${currentUrl}`}
+            href={`${config.SSO_HOST}/keluar?next=${currentUrl}`}
           >
             <div>
               <LogoutOutlined /> Keluar
