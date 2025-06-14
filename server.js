@@ -63,10 +63,10 @@ let runServer = () => {
       //Kompresi gzip
       const compression = require('compression');
       server.use(compression());
-      const jwt = require('jsonwebtoken');
-      const sso_domain = process.env.NODE_ENV !== 'development' ? 'https://sso.bpskolaka.com/' : 'http://localhost:3000/';
-      const sisukma_domain = process.env.NODE_ENV !== 'development' ? 'https://sisukma.bpskolaka.com/' : 'http://localhost/';
       const config = require('./env.config')
+      const jwt = require('jsonwebtoken');
+      const sso_domain = config.SSO_HOST;
+      const sisukma_domain = config.SISUKMA_HOST;
       let login_check = function (req, res, next) {
         if (/static|_next/.test(req.url)) {
           next();
@@ -76,12 +76,12 @@ let runServer = () => {
             jwt.verify(jwtString, process.env.NODE_ENV === 'development' ? config.JWT_SECRET_DEV : config.JWT_SECRET_PROD, function (err, data) {
               if (err) {
                 console.log(err)
-                res.redirect(sso_domain + '?next=' + sisukma_domain)
+                res.redirect(sso_domain + '/?next=' + sisukma_domain)
               }
               else next()
             });
           } else {
-            res.redirect(sso_domain + '?next=' + sisukma_domain)
+            res.redirect(sso_domain + '/?next=' + sisukma_domain)
           }
         }
       }
