@@ -1,4 +1,4 @@
-//error handling
+const config = require('./env.config');//error handling
 
 process.on('uncaughtException', function (err) {
   // handle the error safely
