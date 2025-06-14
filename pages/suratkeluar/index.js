@@ -1,11 +1,12 @@
 import React from 'react'
 import Router from 'next/router'
+import config from '../../env.config'
 
 export default class extends React.Component {
   static async getInitialProps({ req, res }) {
     if (res) {
       res.writeHead(302, {
-        Location: `http://${req.hostname}/suratkeluar/baru`
+        Location: `${config.SISUKMA_HOST}/suratkeluar/baru`
       })
       res.end()
     } else {
